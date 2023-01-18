@@ -661,8 +661,8 @@ const HomePage = (props) => {
     const [noOfPassengers, setNoOfPassengers] = useState(1);
     const [departure,setDeparture]=useState("")
     const [arrival,setArrival]=useState("")
-    const [departureDate,setDepartureDate]=useState()
-    const [arrivalDate,setArrivalDate]=useState()
+    const [departureDate,setDepartureDate]=useState("")
+    const [arrivalDate,setArrivalDate]=useState("")
     const [search,setSearch]=useState({
                 "departureAirport":'',
                 "arrivalAirport":"",
@@ -676,7 +676,7 @@ const HomePage = (props) => {
         let date=new Date()
         console.log(date.getTime())
         console.log(departureDate)
-        if(departureDate==="" && departure==="" && arrival===""){
+        if(departureDate==="" || departure==="" || arrival===""){
             console.log(1);
             return false
         }
@@ -684,10 +684,10 @@ const HomePage = (props) => {
             console.log(3);
             return false
         }
-        // if(new Date(departureDate).getTime() <= date.getTime()){
-        //     console.log(2);
-        //     return false
-        // }
+        if(new Date(departureDate).getTime() <= date.getTime()){
+            console.log(2);
+            return false
+        }
         return true
     }
 
