@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import setTimeout  from "react";
 
 //Get The Token
-const sitelink="https://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
+const sitelink="http://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
 
 const authService = async (JwtData) => {
     await fetch(`${sitelink}/token`, {
