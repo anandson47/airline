@@ -39,12 +39,12 @@ const authService = async (JwtData) => {
 const userDetails = async (tokenDetails) => {
   console.log(tokenDetails);
 
-  let data=axios.post(`${sitelink}/getMyDetails`,{
+  let data=axios.post(`${sitelink}/user/getMyDetails`,{
     "data": 'sample',
    },
    {
      headers: {
-     'authorization':'Bearer '+tokenDetails,
+     'Authorization':'Bearer '+tokenDetails,
      'Content-Type':'application/json'
      }
    })
@@ -57,7 +57,7 @@ const userDetails = async (tokenDetails) => {
 }
   const signup = async (myBody) => {
     console.log(myBody)
-    const status = await fetch(`${sitelink}/signUp`, {
+    const status = await fetch(`${sitelink}/user/signUp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -69,7 +69,7 @@ const userDetails = async (tokenDetails) => {
       .then((data) => {
         toast.success("Registered Succesfully ")
         toast.info("Please proceed to login")
-        setTimeout(() => window.location='/',5000)
+        setTimeout(window.location='/',5000)
         if (data["success"]) {
           console.log("Register Success");
           return true;

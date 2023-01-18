@@ -28,7 +28,7 @@ const Login = () => {
         }
         console.log(user)
         await authService(user);
-        setTimeout(() => window.location = "/", 10000)
+        setTimeout( window.location = "/", 10000)
 
 
     }
