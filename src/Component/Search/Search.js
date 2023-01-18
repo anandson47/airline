@@ -10,13 +10,17 @@ import Select from 'react-select'
 import "tachyons";
 import SearchResult from "./SearchResult";
 import { Navigate, useNavigate } from "react-router";
-import { ToastContainer,toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import searchService from "../../Service/SearchService";
 
 const Search = (props) => {
 
-    const navigate=useNavigate();
-    const [search,setSearch]=useState({})
-    const [count,setCount]=useState(0)
+    const navigate = useNavigate();
+    const [searchResults, setSearchResults] = useState([])
+    const [searchReturnResults, setSearchReturnResults] = useState([])
+    const [search, setSearch] = useState({})
+    const [count, setCount] = useState(0)
+
 
     const options = [
         {
@@ -660,13 +664,39 @@ const Search = (props) => {
             label: "Zero"
         }
     ]
-
     const [tripType, setTripType] = useState("One-way");
     const [tripclass, setTripClass] = useState("Economy");
     const [noOfPassengers, setNoOfPassengers] = useState(1);
+    const [departure, setDeparture] = useState("")
+    const [arrival, setArrival] = useState("")
+    const [departureDate, setDepartureDate] = useState()
+    const [arrivalDate, setArrivalDate] = useState()
+
+    const departureHandler = (e) => {
+        setDeparture(e.label)
+    }
+
+    const arrivalHandler = (e) => {
+        setArrival(e.label)
+    }
+
+    const departureDateHandler = (e) => {
+        setDepartureDate(e.target.value)
+    }
+
+    const arrivalDateHandler = (e) => {
+        setArrivalDate(e.target.value)
+    }
+
 
     const tripTypeHandler = (e) => {
         setTripType(e.target.id);
+        if (e.target.id === "One-way") {
+            document.getElementById("return").disabled = true;
+        }
+        else {
+            document.getElementById("return").disabled = false;
+        }
     }
 
     const tripClassHandler = (e) => {
@@ -676,39 +706,105 @@ const Search = (props) => {
         setNoOfPassengers(e.target.id);
     }
 
-    const resultHandler=(e)=>{
+    const resultHandler = (e) => {
         console.log("time")
         console.log(document.getElementById(e.target.id));
-        if(count===0 && document.getElementById(e.target.id).style.backgroundColor==="white"){
-                document.getElementById(e.target.id).style.backgroundColor="#3A0210"
-                document.getElementById(e.target.id).style.color="white"
-                setCount(1)
-                console.log("hello")
-            }
-        else if(count===1 && document.getElementById(e.target.id).style.backgroundColor==="white"){
-                toast.error("flight already selected")
-                toast.info("please Deselect to continue")
-                console.log("hell")
+        if (count === 0 && document.getElementById(e.target.id).style.backgroundColor === "white") {
+            document.getElementById(e.target.id).style.backgroundColor = "gray"
+            document.getElementById(e.target.id).style.color = "white"
+            setCount(1)
+            console.log("hello")
         }
-        else{
-            document.getElementById(e.target.id).style.backgroundColor="white"
-            document.getElementById(e.target.id).style.color="#3A0210"
+        else if (count === 1 && document.getElementById(e.target.id).style.backgroundColor === "white") {
+            toast.error("flight already selected")
+            toast.info("please Deselect to continue")
+            console.log("hell")
+        }
+        else {
+            document.getElementById(e.target.id).style.backgroundColor = "white"
+            document.getElementById(e.target.id).style.color = "#3A0210"
             console.log("hel")
             setCount(0)
         }
-        
+
     }
-    useEffect(()=>{
-        if(localStorage.getItem("searchDetails")){
+
+    const modifyHandler = () => {
+        let data1 = {
+            "departureAirport": departure,
+            "arrivalAirport": arrival,
+            "departureDate": departureDate,
+            "returnDate": arrivalDate,
+            "seatClass": tripclass,
+            "passenges": noOfPassengers
+        }
+        setSearch(data1)
+        console.log(search)
+        localStorage.setItem("searchDetails", JSON.stringify(data1))
+        searchService(JSON.parse(localStorage.getItem("searchDetails"))).then(
+            res => { setSearchResults(res) }
+        )
+            .catch(error => { console.log(error) })
+        if (JSON.parse(localStorage.getItem("searchDetails")).returnDate !== "") {
+            console.log(JSON.parse(localStorage.getItem("searchDetails")).returnDate)
+            let datainit = JSON.parse(localStorage.getItem("searchDetails"))
+            let data = {
+                "departureAirport": datainit.arrivalAirport,
+                "arrivalAirport": datainit.departureAirport,
+                "departureDate": datainit.returnDate,
+                "returnDate": datainit.returnDate,
+                "seatClass": datainit.seatClass,
+                "passenges": datainit.passenges
+            }
+            console.log(data)
+
+            searchService(data).then(res => { setSearchReturnResults(res) }).catch(error => {
+                setSearchReturnResults([])
+            })
+            document.getElementById("arrival").style.display = "block"
+        }
+        else{
+            document.getElementById("arrival").style.display = "none"
+        }
+
+    }
+
+    useEffect(() => {
+        if (localStorage.getItem("searchDetails")) {
             console.log(JSON.parse(localStorage.getItem("searchDetails")))
             setSearch(JSON.parse(localStorage.getItem("searchDetails")))
             console.log(search)
+            searchService(JSON.parse(localStorage.getItem("searchDetails"))).then(
+                res => { setSearchResults(res) }
+            )
+                .catch(error => { console.log(error) })
+            if (JSON.parse(localStorage.getItem("searchDetails")).returnDate !== "") {
+                console.log(JSON.parse(localStorage.getItem("searchDetails")).returnDate)
+                let datainit = JSON.parse(localStorage.getItem("searchDetails"))
+                let data = {
+                    "departureAirport": datainit.arrivalAirport,
+                    "arrivalAirport": datainit.departureAirport,
+                    "departureDate": datainit.returnDate,
+                    "returnDate": datainit.returnDate,
+                    "seatClass": datainit.seatClass,
+                    "passenges": datainit.passenges
+                }
+                console.log(data)
+
+                searchService(data).then(res => { setSearchReturnResults(res) }).catch(error => {
+                    setSearchReturnResults([])
+                })
+                document.getElementById("arrival").style.display = "block"
+
+            }
         }
-        else{
+        else {
             navigate("/")
             toast.error("Please enter search details")
         }
-    },[])
+        console.log(searchReturnResults)
+
+    }, [])
 
 
     return (
@@ -790,7 +886,7 @@ const Search = (props) => {
                                     menu: (baseStyles, state) => ({
                                         ...baseStyles,
                                         color: "#3A0210",
-                                       borderTop: "2px solid black"
+                                        borderTop: "2px solid black"
                                     }),
                                     menuList: (baseStyles, state) => ({
                                         ...baseStyles,
@@ -800,7 +896,8 @@ const Search = (props) => {
 
                                 }}
                                 options={options}
-                                value={{label:search.departureAirport,value:search.departureAirport}} />
+                                defaultValue={{ label: search.departureAirport, value: search.departureAirport }}
+                                onChange={departureHandler} />
                         </div>
                         <div class="row2 mt-2 fl w-50-ns w-25-l pr2 tc pv1 ">
                             <img className="departure-image" src="assets/images/arrival.png" alt="" /><br />
@@ -822,37 +919,52 @@ const Search = (props) => {
                                     })
                                 }}
                                 options={options}
-                                value={{label:search.arrivalAirport,value:search.arrivalAirport}} />
+                                defaultValue={{ label: search.arrivalAirport, value: search.arrivalAirport }}
+                                onChange={arrivalHandler} />
                         </div>
                         <div class="row2  mt-2 fl w-50-ns w-25-l pr2 tc pv1 ">
                             <img src="/assets/images/date.png" className="departure-image" />
-                            <input className="dates w-100 tc " id="depart" type="date" value={search.departureDate} />
+                            <input className="dates w-100 tc " id="depart" type="date" defaultValue={search.departureDate} onChange={departureDateHandler} />
                         </div>
                         <div class="row2 mt-2 fl w-50-ns w-25-l tc pv1 ">
                             <img src="/assets/images/arrivaldate.png" className="departure-image" />
-                            <input className="dates w-100 tc " disabled id="return" type="date" value={search.returnDate}/>
+                            <input className="dates w-100 tc " disabled id="return" type="date" defaultValue={search.returnDate} onChange={arrivalDateHandler} />
 
                         </div>
                         <div class="fl mt-2 w-100 w-20-ns tc pv2">
-                            <button class="f5 fw5 search grow w-20 ba no-underline ph3 pv2 mb2 dib white " href="#0">Modify</button>
+                            <button class="f5 fw5 search grow w-20 ba no-underline ph3 pv2 mb2 dib white " href="#0" onClick={modifyHandler}>Modify</button>
                         </div>
                     </div>
                 </div>
             </article>
             <div class="search-results">
                 <div class="departing mb4">
-                    <p className="ml5"> Deparating Flights <img src="/assets/images/departure.png" className="search-image"/></p>
-                    <h3 className="mb2 ml5"> {search.departureAirport} to {search.arrivalAirport} <span class="pl3 f4">{new Date(search.departureDate).toDateString() }</span></h3> 
-                    <SearchResult id={"1"} departureTime={"11:50"} departureAirport={search.departureAirport} arrivalAirport={search.arrivalAirport} arrivalTime={"13:05"} totalFare={"Rs 45"} totalTime={"1hr 15min"} flightNumber={"BF"+"1134"} resultHandler={resultHandler}/>
-                    <SearchResult id={"1"} departureTime={"11:50"} departureAirport={search.departureAirport} arrivalAirport={search.arrivalAirport} arrivalTime={"13:05"} totalFare={"Rs 45"} totalTime={"1hr 15min"} flightNumber={"BF"+"1133"} resultHandler={resultHandler}/>
+                    <p className="ml5"> Deparating Flights <img src="/assets/images/departure.png" className="search-image" /></p>
+                    <h3 className="mb2 ml5"> {search.departureAirport} to {search.arrivalAirport} <span class="pl3 f4">{new Date(search.departureDate).toDateString()}</span></h3>
+                    {
+                        searchResults.map(
+                            (result) => {
+                                return (
+                                    <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ? result.fare.bFare : result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} resultHandler={resultHandler} />
+                                )
+                            }
+                        )
+                    }
                 </div>
                 <div id="arrival">
-                    <p className="ml5"> Returning Flights <img src="/assets/images/arrival.png" className="search-image"/></p>
-                    <h3 className="mb2 ml5"> Delhi to Kochi <span>30 January</span></h3> 
-                    <SearchResult/>
-                    <SearchResult/>
-                    <SearchResult/>
-                    <SearchResult/>
+                    <p className="ml5"> Returning Flights <img src="/assets/images/arrival.png" className="search-image" /></p>
+                    <h3 className="mb2 ml5"> {search.arrivalAirport} to {search.departureAirport} <span className="pl3 f4">{new Date(search.returnDate).toDateString()}</span></h3>
+                    {
+
+                        searchReturnResults !== [] ? searchReturnResults.map(
+                            (result) => {
+                                return (
+                                    <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ? result.fare.bFare : result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} resultHandler={resultHandler} />
+                                )
+                            }
+                        )
+                            : []
+                    }
                 </div>
                 <div className="tc pb5">
                     <button className="btn btn-primary">Continue to booking</button>

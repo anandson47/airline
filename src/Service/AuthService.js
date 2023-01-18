@@ -2,8 +2,10 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 //Get The Token
+const sitelink="https://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
+
 const authService = async (JwtData) => {
-    await fetch(`http://localhost:9969/token`, {
+    await fetch(`${sitelink}/token`, {
         method: 'POST',   
       headers: {
         'Accept': 'application/json',
@@ -35,26 +37,8 @@ const authService = async (JwtData) => {
 //Get User Details
 const userDetails = async (tokenDetails) => {
   console.log(tokenDetails);
-  // const data = await fetch(`http://localhost:9969/user/getMyDetails`,{
-  //   method: "GET",
-  //   headers: {
-  //       'Authorization': `Bearer ${localStorage.getItem("token")}`,
-  //       'Accept': 'application/json',
-  //       'Content-Type': 'application/json',
-  //       'Access-Control-Allow-Credentials': true
-  //   },
-  // }
-  // )
-  // .then(data => {
-  //   console.log(data);
-  //   return data
-  // }).catch((error) => {
-  //   // window.alert("Something went Wrong!!");
-  //       console.error("Error:", error);
-  //       return error;
-  // })
 
-  let data=axios.post("http://localhost:9969/user/getMyDetails",{
+  let data=axios.post(`${sitelink}/getMyDetails`,{
     "data": 'sample',
    },
    {
@@ -72,7 +56,7 @@ const userDetails = async (tokenDetails) => {
 }
   const signup = async (myBody) => {
     console.log(myBody)
-    const status = await fetch("http://localhost:9969/user/signUp", {
+    const status = await fetch(`${sitelink}/signUp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

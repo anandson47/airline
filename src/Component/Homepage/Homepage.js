@@ -677,22 +677,27 @@ const HomePage = (props) => {
         console.log(date.getTime())
         console.log(departureDate)
         if(departureDate==="" && departure==="" && arrival===""){
+            console.log(1);
             return false
         }
         if(departure===arrival){
+            console.log(3);
             return false
         }
-        if(new Date(departureDate).getTime() <= date.getTime()){
-            return false
-        }
+        // if(new Date(departureDate).getTime() <= date.getTime()){
+        //     console.log(2);
+        //     return false
+        // }
         return true
     }
 
     const departureChange=(e)=>{
+        console.log(e.label);
         setDeparture(e.label)
     }
 
     const arrivalChange=(e)=>{
+        console.log(e.label);
         setArrival(e.label)
     }
     const departDateChange=(e)=>{
@@ -738,7 +743,7 @@ const HomePage = (props) => {
                 "departureDate":departureDate,
                 "returnDate":arrivalDate,
                 "seatClass":tripclass,
-                "passengers":noOfPassengers
+                "passenges":noOfPassengers
             }
             setSearch(data)
             localStorage.setItem("searchDetails",JSON.stringify(data))
