@@ -1,5 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import setTimeout  from "react";
 
 //Get The Token
 const sitelink="https://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
@@ -68,7 +69,7 @@ const userDetails = async (tokenDetails) => {
       .then((data) => {
         toast.success("Registered Succesfully ")
         toast.info("Please proceed to login")
-        setTimeout(window.location='/',5000)
+        setTimeout(() => window.location='/',5000)
         if (data["success"]) {
           console.log("Register Success");
           return true;

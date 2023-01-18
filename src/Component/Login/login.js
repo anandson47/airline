@@ -1,5 +1,6 @@
 import React from "react";
-import { useState, setTimeOut } from "react";
+import { useState } from "react";
+import setTimeout from "react";
 import axios from "axios";
 import "./login.css";
 import md5 from "md5";
@@ -27,7 +28,7 @@ const Login = () => {
         }
         console.log(user)
         await authService(user);
-        setTimeOut(window.location = "/", 10000)
+        setTimeout(() => window.location = "/", 10000)
 
 
     }
