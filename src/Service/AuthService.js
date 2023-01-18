@@ -90,5 +90,24 @@ const logoutUser = () => {
     localStorage.removeItem("token");
   };
 
+  //------------------------------------------------------
 
-  export { authService , userDetails , signup , logoutUser};
+  //Create Order for payment
+
+  const orderDetails = async (orderInfo) =>{
+    let data=await axios.post("http://localhost:9969/order/createOrder",orderInfo).then(
+        res => {
+          console.log(res.data);
+          toast.success("Order Created");
+          return JSON.parse(JSON.stringify(res.data))
+        }
+        ).catch(error=>{
+          toast.error("Please try after some time");
+          setTimeout(window.location = "/", 3000);
+          console.log(error);
+    })
+    return data
+}
+
+
+  export { authService , userDetails , signup , logoutUser, orderDetails};
