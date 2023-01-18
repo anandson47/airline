@@ -29,7 +29,7 @@ const SearchResult = (props) => {
                             {props.totalFare}
                         </div>
                         <div className="tr">
-                            <button id={props.flightNumber} className="btn btn-primary" onClick={props.resultHandler}>Select Flight</button>
+                            
                         </div>
                     </div>
                 </div>

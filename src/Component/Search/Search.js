@@ -20,6 +20,7 @@ const Search = (props) => {
     const [searchReturnResults, setSearchReturnResults] = useState([])
     const [search, setSearch] = useState({})
     const [count, setCount] = useState(0)
+    const [returncount, setreturnCount] = useState(0)
 
 
     const options = [
@@ -706,27 +707,73 @@ const Search = (props) => {
         setNoOfPassengers(e.target.id);
     }
 
-    const resultHandler = (e) => {
+    const resultHandler = (e, flightDetails) => {
         console.log("time")
         console.log(document.getElementById(e.target.id));
-        if (count === 0 && document.getElementById(e.target.id).style.backgroundColor === "white") {
+        if (count === 0 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
             document.getElementById(e.target.id).style.backgroundColor = "gray"
             document.getElementById(e.target.id).style.color = "white"
+            localStorage.setItem("flightDetails", JSON.stringify(flightDetails))
             setCount(1)
             console.log("hello")
         }
-        else if (count === 1 && document.getElementById(e.target.id).style.backgroundColor === "white") {
+        else if (count === 1 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
             toast.error("flight already selected")
             toast.info("please Deselect to continue")
             console.log("hell")
         }
         else {
-            document.getElementById(e.target.id).style.backgroundColor = "white"
-            document.getElementById(e.target.id).style.color = "#3A0210"
+            document.getElementById(e.target.id).style.backgroundColor = "blue"
+            document.getElementById(e.target.id).style.color = "white"
             console.log("hel")
+            localStorage.setItem("flightDetails", "")
             setCount(0)
         }
 
+    }
+    const returnResultHandler = (e, flightDetails) => {
+        console.log("time")
+        console.log(document.getElementById(e.target.id));
+        if (count === 0 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
+            document.getElementById(e.target.id).style.backgroundColor = "gray"
+            document.getElementById(e.target.id).style.color = "white"
+            localStorage.setItem("returnflightDetails", JSON.stringify(flightDetails))
+            setreturnCount(1)
+            console.log("hello")
+        }
+        else if (count === 1 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
+            toast.error("flight already selected")
+            toast.info("please Deselect to continue")
+            console.log("hell")
+        }
+        else {
+            document.getElementById(e.target.id).style.backgroundColor = "blue"
+            document.getElementById(e.target.id).style.color = "white"
+            console.log("hel")
+            localStorage.setItem("returnflightDetails", "")
+            setreturnCount(0)
+        }
+
+    }
+
+    const onSubmitHandler=()=>{
+        console.log("Hello");
+        if(tripType==="One-way"){
+            if(localStorage.getItem("flightDetails")!==""){
+                navigate("/booking")
+            }
+            else{
+                toast.error("Please Choose a departing flight")
+            }
+        }
+        else{
+            if(localStorage.getItem("flightDetails")!=="" && localStorage.getItem("returnflightDetails")!==""){
+                navigate("/booking")
+            }
+            else{
+                toast.error("Please Choose a departing and return flight")
+            }
+        }
     }
 
     const modifyHandler = () => {
@@ -763,13 +810,17 @@ const Search = (props) => {
             })
             document.getElementById("arrival").style.display = "block"
         }
-        else{
+        else {
             document.getElementById("arrival").style.display = "none"
         }
-
+        if (tripType === "One-way") {
+            document.getElementById("arrival").style.display = "none"
+        }
     }
 
     useEffect(() => {
+        localStorage.setItem("flightDetails","")
+        localStorage.setItem("returnflightDetails","")
         if (localStorage.getItem("searchDetails")) {
             console.log(JSON.parse(localStorage.getItem("searchDetails")))
             setSearch(JSON.parse(localStorage.getItem("searchDetails")))
@@ -939,13 +990,18 @@ const Search = (props) => {
             </article>
             <div class="search-results">
                 <div class="departing mb4">
-                    <p className="ml5"> Deparating Flights <img src="/assets/images/departure.png" className="search-image" /></p>
-                    <h3 className="mb2 ml5"> {search.departureAirport} to {search.arrivalAirport} <span class="pl3 f4">{new Date(search.departureDate).toDateString()}</span></h3>
+                    <p className="ml5-l ml2"> Deparating Flights <img src="/assets/images/departure.png" className="search-image" /></p>
+                    <h3 className="mb2 ml5-l ml2"> {search.departureAirport} to {search.arrivalAirport} <span class="pl3 f4">{new Date(search.departureDate).toDateString()}</span></h3>
                     {
                         searchResults.map(
                             (result) => {
                                 return (
-                                    <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ? result.fare.bFare : result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} resultHandler={resultHandler} />
+                                    <>
+                                        <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ? "$" + result.fare.bFare : "$" + result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} />
+                                        <div className="tc">
+                                            <button id={result.flightNo} className="btn btn-primary" onClick={(e) => resultHandler(e, result)}>Select Flight</button>
+                                        </div>
+                                    </>
                                 )
                             }
                         )
@@ -959,7 +1015,12 @@ const Search = (props) => {
                         searchReturnResults !== [] ? searchReturnResults.map(
                             (result) => {
                                 return (
-                                    <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ? result.fare.bFare : result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} resultHandler={resultHandler} />
+                                    <>
+                                        <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ?"$" + result.fare.bFare : "$" + result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} resultHandler={resultHandler} />
+                                        <div className="tc mb5">
+                                            <button id={result.flightNo} className="btn btn-primary" onClick={(e) => returnResultHandler(e, result)}>Select Flight</button>
+                                        </div>
+                                    </>
                                 )
                             }
                         )
@@ -967,7 +1028,7 @@ const Search = (props) => {
                     }
                 </div>
                 <div className="tc pb5">
-                    <button className="btn btn-primary">Continue to booking</button>
+                    <button className="btn btn-primary" onClick={onSubmitHandler}>Continue to booking</button>
                 </div>
             </div>
             <ToastContainer
