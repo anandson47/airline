@@ -975,11 +975,11 @@ const Search = (props) => {
                         </div>
                         <div class="row2  mt-2 fl w-50-ns w-25-l pr2 tc pv1 ">
                             <img src="/assets/images/date.png" className="departure-image" />
-                            <input className="dates w-100 tc " id="depart" type="date" defaultValue={search.departureDate} onChange={departureDateHandler} />
+                            <input className="dates w-100 tc " id="depart" type="date" onChange={departureDateHandler} />
                         </div>
                         <div class="row2 mt-2 fl w-50-ns w-25-l tc pv1 ">
                             <img src="/assets/images/arrivaldate.png" className="departure-image" />
-                            <input className="dates w-100 tc " disabled id="return" type="date" defaultValue={search.returnDate} onChange={arrivalDateHandler} />
+                            <input className="dates w-100 tc " disabled id="return" type="date" onChange={arrivalDateHandler} />
 
                         </div>
                         <div class="fl mt-2 w-100 w-20-ns tc pv2">

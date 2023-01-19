@@ -147,10 +147,6 @@ const Booking = () => {
     useEffect(() => {
         passengerform()
         if (localStorage.getItem("flightDetails") && localStorage.getItem("flightDetails") !== "") {
-            setFlightDetails(JSON.parse(localStorage.getItem("flightDetails")))
-            setReturnFlightDetails(JSON.parse(localStorage.getItem("returnflightDetails")))
-            console.log(flightDetails)
-            console.log(retunrFlightDetails)
             let passengersArray = []
             let passenger = {
                 firstName: "",
