@@ -4,62 +4,63 @@ import SearchResult from "../Search/SearchResult";
 import useRazorpay from "react-razorpay";
 import { ToastContainer } from "react-toastify";
 import swal from "sweetalert";
+import { useNavigate } from "react-router";
 const Booking = () => {
 
+    const navigate = useNavigate()
+
     const [amount, setAmount] = useState(100);
-    const[contactDetail, setContactDetail] = useState({
-        "phoneNo" : 993848858735,
-        "emailId" : "suraj@gmail.com"
+    const [contactDetail, setContactDetail] = useState({
+        "phoneNo": 993848858735,
+        "emailId": "suraj@gmail.com"
     })
 
-    const[paymentDetails, setPaymentDetails] = useState({})
+    const [paymentDetails, setPaymentDetails] = useState({})
 
     const Razorpay = useRazorpay();
 
-    const [flightDetails,setFlightDetails]=useState("")
-    const [count,setCount]=useState(JSON.parse(localStorage.getItem("searchDetails")).passenges)
-    const [formPassengers,setFormPassengers]=useState()
-    const [retunrFlightDetails,setReturnFlightDetails]=useState([])
+    const [flightDetails, setFlightDetails] = useState("")
+    const [count, setCount] = useState(JSON.parse(localStorage.getItem("searchDetails")).passenges)
+    const [formPassengers, setFormPassengers] = useState()
+    const [retunrFlightDetails, setReturnFlightDetails] = useState([])
 
 
-    const formDetails = () => {
-        let rows = []
-        for (let i = 0; i < 3; i++) {
-            rows.push(passengerform)
-        }
-    }
+
+
+    const [passenger, setPassenger] = useState({
+        firstName: "",
+        lastName: "",
+        gender: "",
+        phoneNumber: "",
+        emailId: "",
+        seatNo: "",
+    })
 
     const passengerform = () => {
-        var passengers=[]
-        for(let i=0;i<count;i++){
-        
-        passengers.push(
-            <div class="cf w-100 center">
-                <div class=" central fl w-10 tc pv3 bg-white">
-                    Passenger Details:
+        var passengers = []
+        for (let i = 0; i < count; i++) {
+
+            passengers.push(
+                <div id={i} class="cf w-100 center">
+                    <div class=" central fl w-10 tc pv3 bg-white">
+                        Passenger Details:
+                    </div>
+                    <input class="info fl w-30 tc pv3 bg-white" id={"fname" + i} placeholder="First Name" required />
+                    <input class="info fl w-30 tc pv3 bg-white" id={"lname" + i} placeholder="Last Name" required />
+                    <input class="info fl w-10 tc pv3 bg-white" id={"gender" + i} placeholder="Gender" required />
                 </div>
-                <input class="info fl w-30 tc pv3 bg-white" placeholder="First Name" />
-                <input class="info fl w-30 tc pv3 bg-white" placeholder="Last Name" />
-                <input class="info fl w-10 tc pv3 bg-white" placeholder="Gender" />
-            </div>
-        )}
+            )
+        }
         setFormPassengers(passengers)
-        
+
     }
 
-    useEffect(()=>{
-        passengerform()
-        if(localStorage.getItem("flightDetails") && localStorage.getItem("flightDetails")!==""){
-            setFlightDetails(JSON.parse(localStorage.getItem("flightDetails")))
-            setReturnFlightDetails(JSON.parse(localStorage.getItem("returnflightDetails")))
-        }
-        
     const razorBtnHandler = () => {
 
         console.log("Paytm Started");
         const orderInfo = {
-            "amount" : amount,
-            "description" : "Book Flight Payment"
+            "amount": amount,
+            "description": "Book Flight Payment"
         }
         orderDetails(orderInfo).then((data) => {
             const order = data
@@ -72,34 +73,34 @@ const Booking = () => {
                 image: "https://capg-train.s3.ap-south-1.amazonaws.com/logo.png",
                 order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
                 handler: function (response) {
-                  alert(response.razorpay_payment_id);
-                  alert(response.razorpay_order_id);
-                  alert(response.razorpay_signature);
-                  setPaymentDetails(response);
-                  swal({
-                    title: "Success",
-                    text: "Successfull Payment",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                  }).then(function () {
-                    // Redirect the user
-                    window.location.href = "/booking/successful";
-                  })
+                    alert(response.razorpay_payment_id);
+                    alert(response.razorpay_order_id);
+                    alert(response.razorpay_signature);
+                    setPaymentDetails(response);
+                    swal({
+                        title: "Success",
+                        text: "Successfull Payment",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    }).then(function () {
+                        // Redirect the user
+                        window.location.href = "/booking/successful";
+                    })
                 },
                 prefill: {
-                  name: "Pankaj",
-                  email: contactDetail.emailId,
-                  contact: contactDetail.phoneNo,
+                    name: "Pankaj",
+                    email: contactDetail.emailId,
+                    contact: contactDetail.phoneNo,
                 },
                 notes: {
-                  address: "BrownFeild Talawde Office",
+                    address: "BrownFeild Talawde Office",
                 },
                 theme: {
-                  color: "#3399cc",
+                    color: "#3399cc",
                 },
-              };
+            };
 
-              const rzp1 = new Razorpay(options);
+            const rzp1 = new Razorpay(options);
 
             rzp1.on("payment.failed", function (response) {
                 alert(response.error.code);
@@ -127,7 +128,48 @@ const Booking = () => {
         })
     }
 
-    })
+    const confirmDetails = (e) => {
+        e.preventDefault()
+        let tempData = passenger
+        for (let i = 0; i < count; i++) {
+            tempData[i] = {
+                firstName: document.getElementById("fname"+[i]).value,
+                lastName: document.getElementById("lname"+[i]).value,
+                gender: document.getElementById("gender"+[i]).value,
+                phoneNumber: document.getElementById("phoneNo").value,
+                emailId: document.getElementById("email").value,
+                seatNo: "",
+            }
+        }
+        console.log(tempData)
+    }
+
+    useEffect(() => {
+        passengerform()
+        if (localStorage.getItem("flightDetails") && localStorage.getItem("flightDetails") !== "") {
+            setFlightDetails(JSON.parse(localStorage.getItem("flightDetails")))
+            setReturnFlightDetails(JSON.parse(localStorage.getItem("returnflightDetails")))
+            console.log(flightDetails)
+            console.log(retunrFlightDetails)
+            let passengersArray = []
+            let passenger = {
+                firstName: "",
+                lastName: "",
+                gender: "",
+                phoneNumber: "",
+                emailId: "",
+                seatNo: "",
+            }
+            for (let i = 0; i < count; i++) {
+                passengersArray.push(passenger)
+            }
+            setPassenger(passengersArray)
+        }
+        else {
+            navigate("/")
+        }
+
+    }, [])
 
     return (
         <div>
@@ -153,18 +195,36 @@ const Booking = () => {
             </nav>
             <div class="cf ">
                 <div class="section1 fl w-100-m w-70-l pv3 ">
-                    <SearchResult />
-                    <div class="card card-body mb4">
+                    <SearchResult
+                        departureTime={new Date(JSON.parse(localStorage.getItem("flightDetails")).departureDateTime).toTimeString().slice(0, 5)}
+                        departureAirport={JSON.parse(localStorage.getItem("flightDetails")).route.departureAirport}
+                        arrivalAirport={JSON.parse(localStorage.getItem("flightDetails")).route.arrivalAirport}
+                        arrivalTime={new Date(JSON.parse(localStorage.getItem("flightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
+                        totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "$" + JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : "$" + JSON.parse(localStorage.getItem("flightDetails")).fare.eFare}
+                        totalTime={JSON.parse(localStorage.getItem("flightDetails")).totalTime / 60 + " hours"} flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
+                    {
+                        localStorage.getItem("returnflightDetails") !== "" ?
+                            <SearchResult
+                                departureTime={new Date(JSON.parse(localStorage.getItem("returnflightDetails")).departureDateTime).toTimeString().slice(0, 5)}
+                                departureAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.departureAirport}
+                                arrivalAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.arrivalAirport}
+                                arrivalTime={new Date(JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
+                                totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "$" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : "$" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare}
+                                totalTime={JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60 + " hours"} flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
+                            :
+                            <></>
+                    }
+                    <form onSubmit={confirmDetails} class="card card-body mb4">
                         {formPassengers}
                         <div class="cf w-100 center">
                             <div class=" central fl w-10 tc pv3 bg-white">
                                 Contact Details:
                             </div>
-                            <input class="info fl w-30 tc pv3 bg-white" type="number" placeholder="Phone Number" />
-                            <input class="info fl w-30 tc pv3 bg-white" type="email" placeholder="Email" />
+                            <input id="phoneNo" class="info fl w-30 tc pv3 bg-white" type="number" placeholder="Phone Number" required />
+                            <input id="email" class="info fl w-30 tc pv3 bg-white" type="email" placeholder="Email" required />
                         </div>
-                        <button className="btn btn-primary w-100">Confirm Details</button>
-                    </div>
+                        <button type="submit" className="btn btn-primary w-100">Confirm Details</button>
+                    </form>
 
                 </div>
                 <div class="fare fl w-100-ns w-100-m w-30-l tc ">

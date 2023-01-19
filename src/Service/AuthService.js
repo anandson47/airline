@@ -95,7 +95,7 @@ const logoutUser = () => {
   //Create Order for payment
 
   const orderDetails = async (orderInfo) =>{
-    let data=await axios.post("http://localhost:9969/order/createOrder",orderInfo).then(
+    let data=await axios.post(`${sitelink}/order/createOrder`,orderInfo).then(
         res => {
           console.log(res.data);
           toast.success("Order Created");
