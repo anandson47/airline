@@ -200,7 +200,7 @@ const Booking = () => {
                         departureAirport={JSON.parse(localStorage.getItem("flightDetails")).route.departureAirport}
                         arrivalAirport={JSON.parse(localStorage.getItem("flightDetails")).route.arrivalAirport}
                         arrivalTime={new Date(JSON.parse(localStorage.getItem("flightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
-                        totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "$" + JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : "$" + JSON.parse(localStorage.getItem("flightDetails")).fare.eFare}
+                        totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "₹" + JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : "₹" + JSON.parse(localStorage.getItem("flightDetails")).fare.eFare}
                         totalTime={JSON.parse(localStorage.getItem("flightDetails")).totalTime / 60 + " hours"} flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
                     {
                         localStorage.getItem("returnflightDetails") !== "" ?
@@ -209,7 +209,7 @@ const Booking = () => {
                                 departureAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.departureAirport}
                                 arrivalAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.arrivalAirport}
                                 arrivalTime={new Date(JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
-                                totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "$" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : "$" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare}
+                                totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare}
                                 totalTime={JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60 + " hours"} flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
                             :
                             <></>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CheckInForm from "./CheckInForm";
 import "./Seat.css"
 import seat from "./seat.png";
+import { toast, ToastContainer } from "react-toastify";
 
 const Seat = (props) => {
 
@@ -39,10 +40,13 @@ const Seat = (props) => {
             props.checkin(seatSelection)
         }
         else if(count===0){
-            alert("All seats selected de select a seat to choose another")
+            //alert("All seats selected de select a seat to choose another")
+            toast.error("All seats selected");
+            toast.info("Deselect a seat to choose another");
         }
         else if(document.getElementById(e.target.id).style.backgroundColor==="gray"){
-            alert("seat already booked")
+            // alert("seat already booked")
+            toast.error("Seat already booked");
         }
         else{
             document.getElementById(e.target.id).style.backgroundColor="lightgreen"
@@ -800,6 +804,17 @@ const Seat = (props) => {
                     </div>
                 </article>
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="dark"
+            />
         </div>
     )
 }
