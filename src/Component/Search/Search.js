@@ -997,7 +997,14 @@ const Search = (props) => {
                             (result) => {
                                 return (
                                     <>
-                                        <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ? "$" + result.fare.bFare : "$" + result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} />
+                                        <SearchResult 
+                                            departureTime={result.route.departureTime.slice(0, 5)} 
+                                            departureAirport={result.route.departureAirport} 
+                                            arrivalAirport={result.route.arrivalAirport} 
+                                            arrivalTime={result.route.arrivalTime.slice(0, 5)} 
+                                            totalFare={search.seatClass === "Business" ? "₹" + result.fare.bFare : "₹" + result.fare.eFare} 
+                                            totalTime={Math.floor(result.totalTime/60) + "hr " + result.totalTime%60 + " min"} 
+                                            flightNumber={"BF" + result.flightNo} />
                                         <div className="tc">
                                             <button id={result.flightNo} className="btn btn-primary" onClick={(e) => resultHandler(e, result)}>Select Flight</button>
                                         </div>
@@ -1016,7 +1023,15 @@ const Search = (props) => {
                             (result) => {
                                 return (
                                     <>
-                                        <SearchResult departureTime={result.route.departureTime.slice(0, 5)} departureAirport={result.route.departureAirport} arrivalAirport={result.route.arrivalAirport} arrivalTime={result.route.arrivalTime.slice(0, 5)} totalFare={search.seatClass === "Business" ?"$" + result.fare.bFare : "$" + result.fare.eFare} totalTime={result.totalTime + " minutes"} flightNumber={"BF" + result.flightNo} resultHandler={resultHandler} />
+                                        <SearchResult 
+                                            departureTime={result.route.departureTime.slice(0, 5)} 
+                                            departureAirport={result.route.departureAirport} 
+                                            arrivalAirport={result.route.arrivalAirport} 
+                                            arrivalTime={result.route.arrivalTime.slice(0, 5)} 
+                                            totalFare={search.seatClass === "Business" ?"₹" + result.fare.bFare : "₹" + result.fare.eFare} 
+                                            totalTime={Math.floor(result.totalTime/60) + " hr" + result.totalTime/60 + "min"} 
+                                            flightNumber={"BF" + result.flightNo} 
+                                            resultHandler={resultHandler} />
                                         <div className="tc mb5">
                                             <button id={result.flightNo} className="btn btn-primary" onClick={(e) => returnResultHandler(e, result)}>Select Flight</button>
                                         </div>
