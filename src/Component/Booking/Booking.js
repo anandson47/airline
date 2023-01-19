@@ -78,6 +78,7 @@ const Booking = () => {
                     alert(response.razorpay_order_id);
                     alert(response.razorpay_signature);
                     setPaymentDetails(response);
+                    console.log(response);
                     console.log(paymentDetails);
                     swal({
                         title: "Success",

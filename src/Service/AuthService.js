@@ -125,5 +125,21 @@ const getGstAmount = async (totalFare, seatClass) =>{
     return data
 }
 
+// Checkin Functions 
+
+getDetailsByPnr = async (pnr) => {
+  let data=await axios.post(`${sitelink}/book/getByPnr?pnr=${pnr}`).then(
+    res => {
+      console.log(res.data);
+      return res.data
+    }
+    ).catch(error=>{
+      toast.error("Please try after some time");
+      setTimeout(window.location = "/", 3000);
+      console.log(error);
+    })
+    return data
+}
+
 
   export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount};
