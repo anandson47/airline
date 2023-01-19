@@ -1,7 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { orderDetails } from "../../Service/AuthService";
 import SearchResult from "../Search/SearchResult";
-
+import useRazorpay from "react-razorpay";
+import { ToastContainer } from "react-toastify";
+import swal from "sweetalert";
 const Booking = () => {
+
+    const [amount, setAmount] = useState(100);
+    const[contactDetail, setContactDetail] = useState({
+        "phoneNo" : 993848858735,
+        "emailId" : "suraj@gmail.com"
+    })
+
+    const[paymentDetails, setPaymentDetails] = useState({})
+
+    const Razorpay = useRazorpay();
 
     const [flightDetails,setFlightDetails]=useState("")
     const [count,setCount]=useState(JSON.parse(localStorage.getItem("searchDetails")).passenges)
@@ -41,6 +54,79 @@ const Booking = () => {
             setReturnFlightDetails(JSON.parse(localStorage.getItem("returnflightDetails")))
         }
         
+    const razorBtnHandler = () => {
+
+        console.log("Paytm Started");
+        const orderInfo = {
+            "amount" : amount,
+            "description" : "Book Flight Payment"
+        }
+        orderDetails(orderInfo).then((data) => {
+            const order = data
+            const options = {
+                key: "rzp_test_pt82f4jFDDF6I0", // Enter the Key ID generated from the Dashboard
+                amount: amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                currency: order.currency,
+                name: "Brown Feild",
+                description: "Flight Booking Payment",
+                image: "https://capg-train.s3.ap-south-1.amazonaws.com/logo.png",
+                order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
+                handler: function (response) {
+                  alert(response.razorpay_payment_id);
+                  alert(response.razorpay_order_id);
+                  alert(response.razorpay_signature);
+                  setPaymentDetails(response);
+                  swal({
+                    title: "Success",
+                    text: "Successfull Payment",
+                    icon: "success",
+                    confirmButtonText: "OK",
+                  }).then(function () {
+                    // Redirect the user
+                    window.location.href = "/booking/successful";
+                  })
+                },
+                prefill: {
+                  name: "Pankaj",
+                  email: contactDetail.emailId,
+                  contact: contactDetail.phoneNo,
+                },
+                notes: {
+                  address: "BrownFeild Talawde Office",
+                },
+                theme: {
+                  color: "#3399cc",
+                },
+              };
+
+              const rzp1 = new Razorpay(options);
+
+            rzp1.on("payment.failed", function (response) {
+                alert(response.error.code);
+                alert(response.error.description);
+                alert(response.error.source);
+                alert(response.error.step);
+                alert(response.error.reason);
+                alert(response.error.metadata.order_id);
+                alert(response.error.metadata.payment_id);
+                // swal({
+                //     title: "Failed",
+                //     text: "Payment Failed",
+                //     icon: "error",
+                //     confirmButtonText: "OK",
+                //   }).then(function () {
+                //     // Redirect the user
+                //     window.location.href = "/booking";
+                //   })
+
+            });
+
+            rzp1.open();
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
     })
 
     return (
@@ -118,12 +204,23 @@ const Booking = () => {
                                     Rs 9200
                                 </div>
                             </div>
-                            <button class="btn btn-primary mt3">Proceed to Pay</button>
+                            <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>
 
                         </div>
                     </article>
                 </div>
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="dark"
+            />
         </div>
     )
 }
