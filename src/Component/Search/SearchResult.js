@@ -20,7 +20,7 @@ const SearchResult = (props) => {
                             <p>{props.arrivalAirport}</p>
                         </div>
                         <div class="fl w-20 w-20-l dn dib-ns tc pt2 " >
-                          <img src="/assets/images/flightNo.png" alt="flight No:" className="flightNo"/><p>{props.flightNumber}</p>  
+                          <img src="/assets/images/FlightNo.png" alt="flight No:" className="flightNo"/><p>{props.flightNumber}</p>  
                         </div>
                         <div class="fl fw5 w-20 w-20-l tc pt2 " >
                             Non-Stop
