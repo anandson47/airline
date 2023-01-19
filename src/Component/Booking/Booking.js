@@ -51,7 +51,7 @@ const Booking = () => {
                 currency: order.currency,
                 name: "Brown Feild",
                 description: "Flight Booking Payment",
-                image: "https://example.com/your_logo",
+                image: "https://capg-train.s3.ap-south-1.amazonaws.com/logo.png",
                 order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
                 handler: function (response) {
                   alert(response.razorpay_payment_id);
@@ -65,7 +65,7 @@ const Booking = () => {
                     confirmButtonText: "OK",
                   }).then(function () {
                     // Redirect the user
-                    window.location.href = "/";
+                    window.location.href = "/booking/successful";
                   })
                 },
                 prefill: {
@@ -91,6 +91,15 @@ const Booking = () => {
                 alert(response.error.reason);
                 alert(response.error.metadata.order_id);
                 alert(response.error.metadata.payment_id);
+                // swal({
+                //     title: "Failed",
+                //     text: "Payment Failed",
+                //     icon: "error",
+                //     confirmButtonText: "OK",
+                //   }).then(function () {
+                //     // Redirect the user
+                //     window.location.href = "/booking";
+                //   })
 
             });
 
