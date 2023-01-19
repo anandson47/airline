@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SearchResult from "../Search/SearchResult";
 
 const Booking = () => {
+
+    const [flightDetails,setFlightDetails]=useState("")
+    const [count,setCount]=useState(JSON.parse(localStorage.getItem("searchDetails")).passenges)
+    const [formPassengers,setFormPassengers]=useState()
+    const [retunrFlightDetails,setReturnFlightDetails]=useState([])
+
 
     const formDetails = () => {
         let rows = []
@@ -11,7 +17,10 @@ const Booking = () => {
     }
 
     const passengerform = () => {
-        return (
+        var passengers=[]
+        for(let i=0;i<count;i++){
+        
+        passengers.push(
             <div class="cf w-100 center">
                 <div class=" central fl w-10 tc pv3 bg-white">
                     Passenger Details:
@@ -20,8 +29,19 @@ const Booking = () => {
                 <input class="info fl w-30 tc pv3 bg-white" placeholder="Last Name" />
                 <input class="info fl w-10 tc pv3 bg-white" placeholder="Gender" />
             </div>
-        )
+        )}
+        setFormPassengers(passengers)
+        
     }
+
+    useEffect(()=>{
+        passengerform()
+        if(localStorage.getItem("flightDetails") && localStorage.getItem("flightDetails")!==""){
+            setFlightDetails(JSON.parse(localStorage.getItem("flightDetails")))
+            setReturnFlightDetails(JSON.parse(localStorage.getItem("returnflightDetails")))
+        }
+        
+    })
 
     return (
         <div>
@@ -49,31 +69,7 @@ const Booking = () => {
                 <div class="section1 fl w-100-m w-70-l pv3 ">
                     <SearchResult />
                     <div class="card card-body mb4">
-
-                        <div class="cf w-100 center">
-                            <div class=" central fl w-10 tc pv3 bg-white">
-                                Passenger Details:
-                            </div>
-                            <input class="info fl w-30 tc pv3 bg-white" placeholder="First Name" />
-                            <input class="info fl w-30 tc pv3 bg-white" placeholder="Last Name" />
-                            <input class="info fl w-10 tc pv3 bg-white" placeholder="Gender" />
-                        </div>
-                        <div class="cf w-100 center">
-                            <div class=" central fl w-10 tc pv3 bg-white">
-                                Passenger Details:
-                            </div>
-                            <input class="info fl w-30 tc pv3 bg-white" placeholder="First Name" />
-                            <input class="info fl w-30 tc pv3 bg-white" placeholder="Last Name" />
-                            <input class="info fl w-10 tc pv3 bg-white" placeholder="Gender" />
-                        </div>
-                        <div class="cf w-100 center">
-                            <div class=" central fl w-10 tc pv3 bg-white">
-                                Passenger Details:
-                            </div>
-                            <input class="info fl w-30 tc pv3 bg-white" placeholder="First Name" />
-                            <input class="info fl w-30 tc pv3 bg-white" placeholder="Last Name" />
-                            <input class="info fl w-10 tc pv3 bg-white" placeholder="Gender" />
-                        </div>
+                        {formPassengers}
                         <div class="cf w-100 center">
                             <div class=" central fl w-10 tc pv3 bg-white">
                                 Contact Details:

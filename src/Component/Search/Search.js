@@ -20,7 +20,7 @@ const Search = (props) => {
     const [searchReturnResults, setSearchReturnResults] = useState([])
     const [search, setSearch] = useState({})
     const [count, setCount] = useState(0)
-    const [returncount, setreturnCount] = useState(0)
+    const [returnCount, setreturnCount] = useState(0)
 
 
     const options = [
@@ -665,7 +665,7 @@ const Search = (props) => {
             label: "Zero"
         }
     ]
-    const [tripType, setTripType] = useState("One-way");
+    const [tripType, setTripType] = useState(JSON.parse(localStorage.getItem("searchDetails")).returnDate!==""?"Round Trip":"One-way");
     const [tripclass, setTripClass] = useState("Economy");
     const [noOfPassengers, setNoOfPassengers] = useState(1);
     const [departure, setDeparture] = useState("")
@@ -734,14 +734,14 @@ const Search = (props) => {
     const returnResultHandler = (e, flightDetails) => {
         console.log("time")
         console.log(document.getElementById(e.target.id));
-        if (count === 0 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
+        if (returnCount === 0 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
             document.getElementById(e.target.id).style.backgroundColor = "gray"
             document.getElementById(e.target.id).style.color = "white"
             localStorage.setItem("returnflightDetails", JSON.stringify(flightDetails))
             setreturnCount(1)
             console.log("hello")
         }
-        else if (count === 1 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
+        else if (returnCount === 1 && document.getElementById(e.target.id).style.backgroundColor !== "gray") {
             toast.error("flight already selected")
             toast.info("please Deselect to continue")
             console.log("hell")
