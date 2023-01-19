@@ -3,6 +3,8 @@ import { useState } from "react";
 import axios from "axios";
 import "../Login/login.css";
 import md5 from "md5";
+import { getDetailsByPnr } from "../../Service/AuthService";
+
 const CheckInForm = () => {
 
     const [pnr , setPnr] = useState("");
@@ -10,14 +12,18 @@ const CheckInForm = () => {
     const [email, setEmail] = useState("");
     
     const onEmailHandler = (e) => {
-        setPnr(e.target.value)
-    }
-    const onPasswordHandler = (e) => {
         setEmail(e.target.value)  
     }
+    const onPnrHandler = (e) => {
+        setPnr(e.target.value)
+    }
 
-    const onSubmitHandler=()=>{
-        
+    const onSubmitHandler=(e)=>{
+        getDetailsByPnr(pnr).then( (data) => {
+            console.log(data);
+        }).catch((error) => {
+            console.log(error);
+        })
         alert("check In")
     }
 
@@ -31,9 +37,9 @@ const CheckInForm = () => {
             <div class="right">
                 <h5 class="">Check In</h5>
                 <div class="inputs pt3">
-                    <input type="text" placeholder="PNR Number" onChange={onEmailHandler}/>
+                    <input type="text" placeholder="PNR Number" onChange={onPnrHandler}/>
                     <br/>
-                    <input type="password" placeholder="Email Address" onChange={onPasswordHandler}/>
+                    <input type="password" placeholder="Email Address" onChange={onEmailHandler}/>
                 </div>
                 <br/><br/>
                 <div class="Login_signup ">

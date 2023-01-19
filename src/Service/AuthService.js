@@ -127,19 +127,18 @@ const getGstAmount = async (totalFare, seatClass) =>{
 
 // Checkin Functions 
 
-getDetailsByPnr = async (pnr) => {
+const getDetailsByPnr = async (pnr) => {
   let data=await axios.post(`${sitelink}/book/getByPnr?pnr=${pnr}`).then(
     res => {
       console.log(res.data);
       return res.data
     }
     ).catch(error=>{
-      toast.error("Please try after some time");
-      setTimeout(window.location = "/", 3000);
+      toast.error("Please enter correct credentials");
       console.log(error);
     })
     return data
 }
 
 
-  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount};
+  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount, getDetailsByPnr};
