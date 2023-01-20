@@ -66,15 +66,24 @@ const Booking = () => {
             )
         }
         setFormPassengers(passengers)
+    }
 
+    function makeid(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
     }
 
     const razorBtnHandler = (e) => {
         e.preventDefault()
         let data = {
-            pnr: "",
-            bookingDate: "",
-            seatClass: "",
+            pnr: makeid(6),
+            bookingDate: new Date(),
+            seatClass: JSON.parse(localStorage.getItem("searchDetails")).seatClass,
             flightBooking: {},
             payment: {},
             passenger: []
