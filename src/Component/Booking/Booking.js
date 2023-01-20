@@ -27,6 +27,10 @@ const Booking = () => {
     const [retunrFlightDetails, setReturnFlightDetails] = useState([])
 
 
+    const [bookingDetails,setBookingDetails]=useState({
+
+    })
+
 
     const [passenger, setPassenger] = useState({
         firstName: "",
@@ -87,7 +91,7 @@ const Booking = () => {
                         confirmButtonText: "OK",
                     }).then(function () {
                         // Redirect the user
-                        window.location= "/booking/successful";
+                        window.location = "/booking/successful";
                     })
                 },
                 prefill: {
@@ -136,9 +140,9 @@ const Booking = () => {
         let tempData = passenger
         for (let i = 0; i < count; i++) {
             tempData[i] = {
-                firstName: document.getElementById("fname"+[i]).value,
-                lastName: document.getElementById("lname"+[i]).value,
-                gender: document.getElementById("gender"+[i]).value,
+                firstName: document.getElementById("fname" + [i]).value,
+                lastName: document.getElementById("lname" + [i]).value,
+                gender: document.getElementById("gender" + [i]).value,
                 phoneNumber: document.getElementById("phoneNo").value,
                 emailId: document.getElementById("email").value,
                 seatNo: "",
@@ -149,7 +153,7 @@ const Booking = () => {
 
     useEffect(() => {
         passengerform()
-        if (localStorage.getItem("flightDetails") && localStorage.getItem("flightDetails") !== "") {
+        if (localStorage.getItem("flightDetails") !== "") {
             let passengersArray = []
             let passenger = {
                 firstName: "",
@@ -164,40 +168,44 @@ const Booking = () => {
             }
             setPassenger(passengersArray)
 
-            if(localStorage.getItem("searchDetails") && localStorage.getItem("searchDetails") !== ""){
+            if (localStorage.getItem("searchDetails") && localStorage.getItem("searchDetails") !== "") {
                 const seatClass = JSON.parse(localStorage.getItem("searchDetails")).seatClass;
-                const fare = JSON.parse(localStorage.getItem("searchDetails")).seatClass.toLowerCase === "business" ? 
-                    JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : 
-                    JSON.parse(localStorage.getItem("flightDetails")).fare.eFare ;
+                const fare = JSON.parse(localStorage.getItem("searchDetails")).seatClass.toLowerCase === "business" ?
+                    JSON.parse(localStorage.getItem("flightDetails")).fare.bFare :
+                    JSON.parse(localStorage.getItem("flightDetails")).fare.eFare;
 
-                const passNum =   JSON.parse(localStorage.getItem("searchDetails")).passenges;
+                const passNum = JSON.parse(localStorage.getItem("searchDetails")).passenges;
 
-                const allPassFare = fare*passNum;
-                
+                const allPassFare = fare * passNum;
+
                 //This is for to display
                 getGstAmount(allPassFare, seatClass).then((data) => {
-                    setFlightFare( () => {
-                        const tempVar = {...flightFare, 
-                        "baseFare": fare,
-                        "cgst" : data, 
-                         "sgst": data,
-                        "totalFare" : allPassFare,
-                        "passengers":passNum
+                    setFlightFare(() => {
+                        const tempVar = {
+                            ...flightFare,
+                            "baseFare": fare,
+                            "cgst": data,
+                            "sgst": data,
+                            "totalFare": allPassFare,
+                            "passengers": passNum
                         }
-                         return tempVar;
+                        return tempVar;
                     })
 
                     //Set Total Amount for Razorpay Payment
                     setAmount(flightFare.totalFare + flightFare.cgst + flightFare.sgst)
                 })
-                
+
+            }
+            else{
+
             }
         }
         else {
             navigate("/")
         }
 
-    }, [amount])
+    }, [])
 
     return (
         <div>
@@ -229,7 +237,7 @@ const Booking = () => {
                         arrivalAirport={JSON.parse(localStorage.getItem("flightDetails")).route.arrivalAirport}
                         arrivalTime={new Date(JSON.parse(localStorage.getItem("flightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
                         totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "₹" + JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : "₹" + JSON.parse(localStorage.getItem("flightDetails")).fare.eFare}
-                        totalTime={Math.ceil(JSON.parse(localStorage.getItem("flightDetails")).totalTime / 60) + "hr " + JSON.parse(localStorage.getItem("flightDetails")).totalTime % 60 + "min"} 
+                        totalTime={Math.ceil(JSON.parse(localStorage.getItem("flightDetails")).totalTime / 60) + "hr " + JSON.parse(localStorage.getItem("flightDetails")).totalTime % 60 + "min"}
                         flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
                     {
                         localStorage.getItem("returnflightDetails") !== "" ?
@@ -239,7 +247,7 @@ const Booking = () => {
                                 arrivalAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.arrivalAirport}
                                 arrivalTime={new Date(JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
                                 totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare}
-                                totalTime={JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60 + "hr "} flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
+                                totalTime={Math.floor(JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60 )+ "hr " + JSON.parse(localStorage.getItem("returnflightDetails")).totalTime % 60 +"min" } flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
                             :
                             <></>
                     }
@@ -264,15 +272,15 @@ const Booking = () => {
                                 <div class="fl w-50 tc pv1 bg-black-05 ">
                                     Base Fare
                                 </div>
-                                <div class="fl w-30 tr pv1 bg-black-025 ">
-                                   {"₹ " + flightFare.baseFare + " × " + flightFare.passengers}
+                                <div class="fl w-40 tr pv1 bg-black-025 ">
+                                    {"₹ " + flightFare.baseFare + " × " + flightFare.passengers}
                                 </div>
                             </div>
                             <div class="cf">
                                 <div class="fl w-50 tc pv1 bg-black-05 ">
                                     Central GST
                                 </div>
-                                <div class="fl w-30 tr pv1 bg-black-025">
+                                <div class="fl w-40 tr pv1 bg-black-025">
                                     {"₹ " + flightFare.cgst}
                                 </div>
                             </div>
@@ -280,7 +288,7 @@ const Booking = () => {
                                 <div class="fl w-50 tc pv1 bg-black-05">
                                     State GST
                                 </div>
-                                <div class="fl w-30 tr pv1 bg-black-025">
+                                <div class="fl w-40 tr pv1 bg-black-025">
                                     {"₹ " + flightFare.sgst}
                                 </div>
                             </div>
@@ -289,8 +297,8 @@ const Booking = () => {
                                 <div class="fl w-50 tc pv1 bg-black-05">
                                     Total Payable
                                 </div>
-                                <div class="fl w-30 tr pv1 bg-black-025">
-                                     { "₹" + amount}
+                                <div class="fl w-40 tr pv1 bg-black-025">
+                                    {"₹" + amount}
                                 </div>
                             </div>
                             <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>

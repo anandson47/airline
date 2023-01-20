@@ -1029,7 +1029,7 @@ const Search = (props) => {
                                             arrivalAirport={result.route.arrivalAirport} 
                                             arrivalTime={result.route.arrivalTime.slice(0, 5)} 
                                             totalFare={search.seatClass === "Business" ?"₹" + result.fare.bFare : "₹" + result.fare.eFare} 
-                                            totalTime={Math.floor(result.totalTime/60) + " hr" + result.totalTime/60 + "min"} 
+                                            totalTime={Math.floor(result.totalTime/60) + " hr" + result.totalTime%60 + "min"} 
                                             flightNumber={"BF" + result.flightNo} 
                                             resultHandler={resultHandler} />
                                         <div className="tc mb5">
