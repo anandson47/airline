@@ -9,6 +9,15 @@ const Booking = () => {
 
     const navigate = useNavigate()
 
+    const [bookingDetails, setBookingDetails] = useState({
+        pnr: "",
+        bookingDate: "",
+        seatClass: "",
+        flightBooking: {},
+        payment: {},
+        passenger: []
+    })
+
     const [amount, setAmount] = useState(1000);     //This is the total amount
     const [contactDetail, setContactDetail] = useState({
         "phoneNo": 993848858735,
@@ -27,7 +36,7 @@ const Booking = () => {
     const [retunrFlightDetails, setReturnFlightDetails] = useState([])
 
 
-    const [bookingDetails,setBookingDetails]=useState({
+    const [returnbookingDetails, setReturnBookingDetails] = useState({
 
     })
 
@@ -62,6 +71,16 @@ const Booking = () => {
 
     const razorBtnHandler = (e) => {
         e.preventDefault()
+        let data = {
+            pnr: "",
+            bookingDate: "",
+            seatClass: "",
+            flightBooking: {},
+            payment: {},
+            passenger: []
+        }
+
+
         console.log("Paytm Started");
         const orderInfo = {
             "amount": amount,
@@ -170,30 +189,31 @@ const Booking = () => {
 
             if (localStorage.getItem("searchDetails") && localStorage.getItem("searchDetails") !== "") {
                 const seatClass = JSON.parse(localStorage.getItem("searchDetails")).seatClass;
-                const goFare = seatClass.toLowerCase === "business" ? 
-                    JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : 
-                    JSON.parse(localStorage.getItem("flightDetails")).fare.eFare ;
+                const goFare = seatClass.toLowerCase === "business" ?
+                    JSON.parse(localStorage.getItem("flightDetails")).fare.bFare :
+                    JSON.parse(localStorage.getItem("flightDetails")).fare.eFare;
 
                 var returnFare = 0;
-                if (localStorage.getItem("returnflightDetails") && localStorage.getItem("returnflightDetails") !== ""){
-                        returnFare =  seatClass.toLowerCase === "business" ? 
-                        JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : 
-                        JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare ;
-                }            
-                const passNum =   JSON.parse(localStorage.getItem("searchDetails")).passenges;
+                if (localStorage.getItem("returnflightDetails") && localStorage.getItem("returnflightDetails") !== "") {
+                    returnFare = seatClass.toLowerCase === "business" ?
+                        JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare :
+                        JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare;
+                }
+                const passNum = JSON.parse(localStorage.getItem("searchDetails")).passenges;
 
-                const allPassFare = (goFare + returnFare)*passNum;
-                
+                const allPassFare = (goFare + returnFare) * passNum;
+
                 //This is for to display
                 getGstAmount(allPassFare, seatClass).then((data) => {
-                    setFlightFare( () => {
-                        const tempVar = {...flightFare, 
-                        "goFare": goFare,
-                        "cgst" : data, 
-                         "sgst": data,
-                        "totalFare" : allPassFare,
-                        "passengers":passNum,
-                        "returnFare" : returnFare
+                    setFlightFare(() => {
+                        const tempVar = {
+                            ...flightFare,
+                            "goFare": goFare,
+                            "cgst": data,
+                            "sgst": data,
+                            "totalFare": allPassFare,
+                            "passengers": passNum,
+                            "returnFare": returnFare
                         }
                         return tempVar;
                     })
@@ -203,7 +223,7 @@ const Booking = () => {
                 })
 
             }
-            else{
+            else {
                 navigate("/")
             }
         }
@@ -253,7 +273,7 @@ const Booking = () => {
                                 arrivalAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.arrivalAirport}
                                 arrivalTime={new Date(JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
                                 totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare}
-                                totalTime={Math.ceil(JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60) + "hr " + JSON.parse(localStorage.getItem("returnflightDetails")).totalTime %  60 + "min"} 
+                                totalTime={Math.ceil(JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60) + "hr " + JSON.parse(localStorage.getItem("returnflightDetails")).totalTime % 60 + "min"}
                                 flightNumber={"BF" + JSON.parse(localStorage.getItem("returnflightDetails")).flightNo} />
                             :
                             <></>
@@ -279,8 +299,8 @@ const Booking = () => {
                                 <div class="fl w-50 tc pv1 bg-black-05 ">
                                     Base Fare
                                 </div>
-                                <div class="fl w-30 tr pv1 bg-black-025 ">
-                                   {"₹ " + (flightFare.goFare + flightFare.returnFare) +" × " + flightFare.passengers}
+                                <div class="fl w-40 tr pv1 bg-black-025 ">
+                                    {"₹ " + (flightFare.goFare + flightFare.returnFare) + " × " + flightFare.passengers}
                                 </div>
                             </div>
                             <div class="cf">
