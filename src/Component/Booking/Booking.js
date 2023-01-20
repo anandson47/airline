@@ -55,8 +55,8 @@ const Booking = () => {
 
     }
 
-    const razorBtnHandler = () => {
-
+    const razorBtnHandler = (e) => {
+        e.preventDefault()
         console.log("Paytm Started");
         const orderInfo = {
             "amount": amount,
@@ -84,7 +84,7 @@ const Booking = () => {
                         confirmButtonText: "OK",
                     }).then(function () {
                         // Redirect the user
-                        window.location.href = "/booking/successful";
+                        window.location= "/booking/successful";
                     })
                 },
                 prefill: {
