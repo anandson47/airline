@@ -170,24 +170,30 @@ const Booking = () => {
 
             if (localStorage.getItem("searchDetails") && localStorage.getItem("searchDetails") !== "") {
                 const seatClass = JSON.parse(localStorage.getItem("searchDetails")).seatClass;
-                const fare = JSON.parse(localStorage.getItem("searchDetails")).seatClass.toLowerCase === "business" ?
-                    JSON.parse(localStorage.getItem("flightDetails")).fare.bFare :
-                    JSON.parse(localStorage.getItem("flightDetails")).fare.eFare;
+                const goFare = seatClass.toLowerCase === "business" ? 
+                    JSON.parse(localStorage.getItem("flightDetails")).fare.bFare : 
+                    JSON.parse(localStorage.getItem("flightDetails")).fare.eFare ;
 
-                const passNum = JSON.parse(localStorage.getItem("searchDetails")).passenges;
+                var returnFare = 0;
+                if (localStorage.getItem("returnflightDetails") && localStorage.getItem("returnflightDetails") !== ""){
+                        returnFare =  seatClass.toLowerCase === "business" ? 
+                        JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : 
+                        JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare ;
+                }            
+                const passNum =   JSON.parse(localStorage.getItem("searchDetails")).passenges;
 
-                const allPassFare = fare * passNum;
-
+                const allPassFare = (goFare + returnFare)*passNum;
+                
                 //This is for to display
                 getGstAmount(allPassFare, seatClass).then((data) => {
-                    setFlightFare(() => {
-                        const tempVar = {
-                            ...flightFare,
-                            "baseFare": fare,
-                            "cgst": data,
-                            "sgst": data,
-                            "totalFare": allPassFare,
-                            "passengers": passNum
+                    setFlightFare( () => {
+                        const tempVar = {...flightFare, 
+                        "goFare": goFare,
+                        "cgst" : data, 
+                         "sgst": data,
+                        "totalFare" : allPassFare,
+                        "passengers":passNum,
+                        "returnFare" : returnFare
                         }
                         return tempVar;
                     })
@@ -198,7 +204,7 @@ const Booking = () => {
 
             }
             else{
-
+                navigate("/")
             }
         }
         else {
@@ -247,7 +253,8 @@ const Booking = () => {
                                 arrivalAirport={JSON.parse(localStorage.getItem("returnflightDetails")).route.arrivalAirport}
                                 arrivalTime={new Date(JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime).toTimeString().slice(0, 5)}
                                 totalFare={JSON.parse(localStorage.getItem("searchDetails")).seatClass === "Business" ? "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.bFare : "₹" + JSON.parse(localStorage.getItem("returnflightDetails")).fare.eFare}
-                                totalTime={Math.floor(JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60 )+ "hr " + JSON.parse(localStorage.getItem("returnflightDetails")).totalTime % 60 +"min" } flightNumber={"BF" + JSON.parse(localStorage.getItem("flightDetails")).flightNo} />
+                                totalTime={Math.ceil(JSON.parse(localStorage.getItem("returnflightDetails")).totalTime / 60) + "hr " + JSON.parse(localStorage.getItem("returnflightDetails")).totalTime %  60 + "min"} 
+                                flightNumber={"BF" + JSON.parse(localStorage.getItem("returnflightDetails")).flightNo} />
                             :
                             <></>
                     }
@@ -272,8 +279,8 @@ const Booking = () => {
                                 <div class="fl w-50 tc pv1 bg-black-05 ">
                                     Base Fare
                                 </div>
-                                <div class="fl w-40 tr pv1 bg-black-025 ">
-                                    {"₹ " + flightFare.baseFare + " × " + flightFare.passengers}
+                                <div class="fl w-30 tr pv1 bg-black-025 ">
+                                   {"₹ " + (flightFare.goFare + flightFare.returnFare) +" × " + flightFare.passengers}
                                 </div>
                             </div>
                             <div class="cf">
