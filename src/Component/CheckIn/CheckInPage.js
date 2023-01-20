@@ -7,6 +7,9 @@ import SearchResult from "../Search/SearchResult";
 import Passenger from "./Passenger";
 import TermsAndConditions from "./TermsAndConditions";
 import confirm from "./confirm.png"
+import { orderDetails } from "../../Service/AuthService";
+import swal from "sweetalert";
+import useRazorpay from "react-razorpay";
 
 const CheckInPage = (props) => {
 
@@ -17,6 +20,11 @@ const CheckInPage = (props) => {
     const [count, setCount]= useState(-1);
     const [passengerList,setPassengerList]=useState(props.passengerList);
     const [temporaryData, setTemporaryData]=useState(props.passengerList)
+
+    const [amount, setAmount] = useState(1000);
+    const [paymentDetails, setPaymentDetails] = useState({})
+
+    const Razorpay = useRazorpay();
 
     const checkAcknowlegdement=(yes)=>{
         console.log(yes)
@@ -48,10 +56,74 @@ const CheckInPage = (props) => {
          });
          setPassengerList(data)
          
-         
-        
-         
       }
+
+      //Payment Code
+      const razorBtnHandler = () => {
+
+        console.log("Paytm Started");
+        const orderInfo = {
+            "amount": amount,
+            "description": "CheckIn Flight Payment"
+        }
+        orderDetails(orderInfo).then((data) => {
+            const order = data
+            const options = {
+                key: "rzp_test_pt82f4jFDDF6I0", // Enter the Key ID generated from the Dashboard
+                amount: amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                currency: order.currency,
+                name: "Brown Feild",
+                description: "Flight CheckIn Payment",
+                image: "https://capg-train.s3.ap-south-1.amazonaws.com/logo.png",
+                order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
+                handler: function (response) {
+                    alert(response.razorpay_payment_id);
+                    alert(response.razorpay_order_id);
+                    alert(response.razorpay_signature);
+                    setPaymentDetails(response);
+                    console.log(paymentDetails);
+                    swal({
+                        title: "Success",
+                        text: "Successfull Payment",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    }).then(function () {
+                        // Redirect the user
+                        window.location.href = "/booking/successful";
+                    })
+                },
+                prefill: {
+                    name: "Pankaj",
+                    email: "",
+                    contact: "",
+                },
+                notes: {
+                    address: "BrownFeild Talawde Office",
+                },
+                theme: {
+                    color: "#3399cc",
+                },
+            };
+
+            const rzp1 = new Razorpay(options);
+
+            rzp1.on("payment.failed", function (response) {
+                alert(response.error.code);
+                alert(response.error.description);
+                alert(response.error.source);
+                alert(response.error.step);
+                alert(response.error.reason);
+                alert(response.error.metadata.order_id);
+                alert(response.error.metadata.payment_id);
+
+            });
+
+            rzp1.open();
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
 
     return (
         <div>
@@ -136,7 +208,7 @@ const CheckInPage = (props) => {
                                         Seat Fare:
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025 ">
-                                        Rs 300
+                                    ₹ 300
                                     </div>
                                 </div>
                                 <div class="cf">
@@ -144,7 +216,7 @@ const CheckInPage = (props) => {
                                         Central GST
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                        Rs 54
+                                    ₹ 54
                                     </div>
                                 </div>
                                 <div class="cf">
@@ -152,7 +224,7 @@ const CheckInPage = (props) => {
                                         State GST
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                        Rs 54
+                                    ₹ 54
                                     </div>
                                 </div>
                                 <hr/>
@@ -161,9 +233,10 @@ const CheckInPage = (props) => {
                                        Total Payable 
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                        Rs 408
+                                    ₹ 408
                                     </div>
                                 </div>
+                                <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>
                             </div>
                         </article>
                     </div>
