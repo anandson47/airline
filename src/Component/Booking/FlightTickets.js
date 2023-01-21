@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Fragment } from 'react';
 import { Page, Text, View, Document, StyleSheet, PDFViewer, Image } from '@react-pdf/renderer';
 import Table from "@david.kucsai/react-pdf-table";
@@ -90,6 +90,65 @@ const FlightTickets = () => {
 
     });
 
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+    const passengers = [
+        {
+            "firstName" :  "Suraj",
+            "lastName" : "Yadav",
+            "phone" : "8868474767",
+            "email" : "pankaj@gmail.com"
+        }
+    ]
+
+    //const [passenger, setPassenger] = useState([]);
+
+    const bookedDetails = JSON.parse(window.sessionStorage.getItem("bookedDetails"));
+    const searchDetails = JSON.parse(window.localStorage.getItem("searchDetails"));
+    const flightDetails = JSON.parse(window.localStorage.getItem("flightDetails"));
+    const fareDetails   = JSON.parse(window.sessionStorage.getItem("fareDetails"));
+
+    const departureDate = new Date(flightDetails.departureDateTime);
+    const arrivalDate = new Date(flightDetails.arrivalDateTime);
+
+    //Get details of Return Booked Details
+    let returnBookedDetails;
+    let returnDepartureDate;
+    let returnArrivalDate;
+    if(JSON.parse(window.sessionStorage.getItem("returnbookedDetails")).bookingId){
+        
+        returnBookedDetails = JSON.parse(window.sessionStorage.getItem("returnbookedDetails"));
+        returnDepartureDate = new Date(flightDetails.departureDateTime);
+        returnArrivalDate= new Date(flightDetails.arrivalDateTime);
+    
+    }
+    console.log(returnBookedDetails);
+
+    const goFare = fareDetails.goFare
+    const returnFare = fareDetails.returnFare
+    const totalGst = fareDetails.cgst = fareDetails.sgst
+
+    var passengerView = bookedDetails.passenger.map((pass) => {
+        return (
+            <View style={styles.tableRow}>
+            <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{pass.firstName}</Text>
+            </View>
+            <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{pass.lastName}</Text>
+            </View>
+            <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{pass.phoneNumber}</Text>
+            </View>
+            <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{pass.emailId}</Text>
+            </View>
+        </View>
+            );
+      });
+
     // Create Document Component
     const MyDocument = () => (
         <Document>
@@ -99,19 +158,19 @@ const FlightTickets = () => {
                         <Image src="/assets/images/logo.png"></Image>
                     </View>
                     <View style={styles.flightDetails}>
-                        <Text>Kochi to Delhi</Text>
+                        <Text>{searchDetails.departureAirport} to {searchDetails.arrivalAirport}</Text>
                         <Text style={styles.flightTime}>
-                            Date:23rd January 2023
+                            Departure Date: {departureDate.getDate() + " " + monthNames[departureDate.getMonth()] + " " + departureDate.getFullYear()}
                         </Text>
                         <Text style={styles.flightTime}>
-                            Departure - 11:50
+                            Departure - {departureDate.toLocaleTimeString()}
                         </Text>
                         <Text style={styles.flightTime}>
-                            Arrival - 13:05
+                            Arrival - {arrivalDate.toLocaleTimeString()}
                         </Text>
                     </View>
                     <View>
-                        <Text>PNR Number: 123456</Text>
+                        <Text>PNR Number: {bookedDetails.pnrNo}</Text>
                     </View>
                     <View style={styles.passengerDetails}>
                         <View style={styles.table}>
@@ -129,20 +188,7 @@ const FlightTickets = () => {
                                     <Text style={styles.tableCell}>Email Address</Text>
                                 </View>
                             </View>
-                            <View style={styles.tableRow}>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>Anand</Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>Vijay</Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>8593988691</Text>
-                                </View>
-                                <View style={styles.tableCol}>
-                                    <Text style={styles.tableCell}>anandson47@gmail.com</Text>
-                                </View>
-                            </View>
+                            {passengerView}
                         </View>
                     </View>
                     <View>
@@ -160,15 +206,15 @@ const FlightTickets = () => {
                                     <Text style={styles.tableCell}>Ticket Fare</Text>
                                 </View>
                                 <View style={styles.tableCol2}>
-                                    <Text style={styles.tableCell}>11,000</Text>
+                                    <Text style={styles.tableCell}>{goFare}</Text>
                                 </View>
                             </View>\
                             <View style={styles.tableRow}>
                                 <View style={styles.tableCol2}>
-                                    <Text style={styles.tableCell}>GST</Text>
+                                    <Text style={styles.tableCell}>GST(SGST + CGST)</Text>
                                 </View>
                                 <View style={styles.tableCol2}>
-                                    <Text style={styles.tableCell}>2400</Text>
+                                    <Text style={styles.tableCell}>{returnFare > 0 ? Math.round(totalGst / 2) : totalGst}</Text>
                                 </View>
                             </View>
                             <View style={styles.tableRow}>
@@ -176,7 +222,7 @@ const FlightTickets = () => {
                                     <Text style={styles.tableCell}>Total Amount</Text>
                                 </View>
                                 <View style={styles.tableCol2}>
-                                    <Text style={styles.tableCell}>13400</Text>
+                                    <Text style={styles.tableCell}>{fareDetails.goFare + (returnFare > 0 ? Math.round(totalGst / 2) : totalGst)}</Text>
                                 </View>
                             </View>
                         </View>
@@ -191,13 +237,104 @@ const FlightTickets = () => {
                 </View>
 
             </Page>
+            {
+                returnBookedDetails ? ( 
+            <Page size="A4" style={styles.page}>
+                <View style={styles.section}>
+                    <View style={styles.logo}>
+                        <Image src="/assets/images/logo.png"></Image>
+                    </View>
+                    <View style={styles.flightDetails}>
+                        <Text>{searchDetails.arrivalAirport} to {searchDetails.departureAirport}</Text>
+                        <Text style={styles.flightTime}>
+                            Departure Date: {returnDepartureDate.getDate() + " " + monthNames[returnDepartureDate.getMonth()] + " " + returnDepartureDate.getFullYear()}
+                        </Text>
+                        <Text style={styles.flightTime}>
+                            Departure - {returnDepartureDate.toLocaleTimeString()}
+                        </Text>
+                        <Text style={styles.flightTime}>
+                            Arrival - {returnArrivalDate.toLocaleTimeString()}
+                        </Text>
+                    </View>
+                    <View>
+                        <Text>PNR Number: {returnBookedDetails.pnrNo}</Text>
+                    </View>
+                    <View style={styles.passengerDetails}>
+                        <View style={styles.table}>
+                            <View style={styles.tableRow}>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>First Name</Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>Last Name</Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>Phone number</Text>
+                                </View>
+                                <View style={styles.tableCol}>
+                                    <Text style={styles.tableCell}>Email Address</Text>
+                                </View>
+                            </View>
+                            {passengerView}
+                        </View>
+                    </View>
+                    <View>
+                        <View style={styles.table}>
+                            <View style={styles.tableRow}>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>Fare</Text>
+                                </View>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>Amount (in Rs)</Text>
+                                </View>
+                            </View>
+                            <View style={styles.tableRow}>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>Ticket Fare</Text>
+                                </View>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>{fareDetails.goFare}</Text>
+                                </View>
+                            </View>\
+                            <View style={styles.tableRow}>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>GST(SGST + CGST)</Text>
+                                </View>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>{Math.round(totalGst/2)}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.tableRow}>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>Total Amount</Text>
+                                </View>
+                                <View style={styles.tableCol2}>
+                                    <Text style={styles.tableCell}>{fareDetails.goFare + Math.round(totalGst/2)}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.prohibited}>
+                        <Image   src="/assets/images/prohibited.png"/>
+                    </View>
+                    <View style={styles.message}>
+                        <Text> Enjoy Your Journey With Brownfield</Text>
+                    </View>
+
+                </View>
+
+            </Page>
+                ) : "" 
+            }
         </Document>
     );
 
     return (
+        <div>
         <PDFViewer className='w-100' style={{ height: "100vh" }}>
             <MyDocument />
         </PDFViewer>
+        </div>
     )
 }
 export default FlightTickets
