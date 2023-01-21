@@ -117,7 +117,7 @@ const FlightTickets = () => {
     let returnBookedDetails;
     let returnDepartureDate;
     let returnArrivalDate;
-    if(JSON.parse(window.sessionStorage.getItem("returnbookedDetails")).bookingId){
+    if(window.sessionStorage.getItem("returnbookedDetails") && JSON.parse(window.sessionStorage.getItem("returnbookedDetails")).bookingId){
         
         returnBookedDetails = JSON.parse(window.sessionStorage.getItem("returnbookedDetails"));
         returnDepartureDate = new Date(flightDetails.departureDateTime);
