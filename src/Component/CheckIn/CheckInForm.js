@@ -8,7 +8,6 @@ import { getDetailsByPnr } from "../../Service/AuthService";
 const CheckInForm = () => {
 
     const [pnr , setPnr] = useState("");
-    const [session , setSession] = useState("");
     const [email, setEmail] = useState("");
     
     const onEmailHandler = (e) => {

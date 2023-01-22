@@ -131,6 +131,7 @@ const getDetailsByPnr = async (pnr) => {
   let data=await axios.post(`${sitelink}/book/getByPnr?pnr=${pnr}`).then(
     res => {
       console.log(res.data);
+      
       return res.data
     }
     ).catch(error=>{
