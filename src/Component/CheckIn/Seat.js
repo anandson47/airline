@@ -7,7 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 const Seat = (props) => {
 
     const [seatBooked,setSeatsBooked]=useState(props.seatsBooked)
-    const [count,setCount]=useState(props.passengers)
+    const [count,setCount]=useState(props.passengers.length)
     const [seatSelection, setSeatSelection]=useState(new Array());
     
 

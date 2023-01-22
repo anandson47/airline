@@ -3,8 +3,8 @@ import { toast } from "react-toastify";
 import setTimeout  from "react";
 
 //Get The Token
-const sitelink="http://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
-// const sitelink="http://localhost:9969"
+// const sitelink="http://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
+const sitelink="http://localhost:9969"
 
 const authService = async (JwtData) => {
     await fetch(`${sitelink}/token`, {
@@ -144,8 +144,10 @@ const bookFlight = async(bookingDetails) => {
 
 // Checkin Functions 
 
-const getDetailsByPnr = async (pnr) => {
-  let data=await axios.post(`${sitelink}/book/getByPnr?pnr=${pnr}`).then(
+// const checkinlink="http://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
+const checkinlink  = "http://localhost:8075"
+const getDetailsByPnr = async (checkinDetails) => {
+  let data=await axios.post(`${checkinlink}/checkin/validatePnr`, checkinDetails).then(
     res => {
       console.log(res.data);
       return res.data

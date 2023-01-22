@@ -19,12 +19,26 @@ const CheckInForm = () => {
     }
 
     const onSubmitHandler=(e)=>{
-        getDetailsByPnr(pnr).then( (data) => {
+        const checkInDatials = {
+            "pnr" : pnr,
+            "emailId" : email
+        }
+        getDetailsByPnr(checkInDatials).then( (data) => {
             console.log(data);
+            console.log(data.checkInDetails)
+            
+            window.sessionStorage.setItem("checkInDetails", JSON.stringify(data.checkInDetails));
+            window.sessionStorage.setItem("flightBooking", JSON.stringify(data.flightBooking));
+            window.sessionStorage.setItem("flight", JSON.stringify(data.flight));
+            window.sessionStorage.setItem("seatsBussinessBooked", JSON.stringify(data.seatsBussinessBooked));
+            window.sessionStorage.setItem("seatsEconomyBooked", JSON.stringify(data.seatsEconomyBooked));
+            window.sessionStorage.setItem("bookingDetails", JSON.stringify(data.bookingDetails));
+            
+            window.location.href = "/checkIn";
+
         }).catch((error) => {
             console.log(error);
         })
-        alert("check In")
     }
 
     return (

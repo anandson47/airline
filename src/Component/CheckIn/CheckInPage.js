@@ -13,13 +13,19 @@ import useRazorpay from "react-razorpay";
 
 const CheckInPage = (props) => {
 
+    const flightBooking =  JSON.parse(window.sessionStorage.getItem("flightBooking"));
+    const flightDetails = JSON.parse(window.sessionStorage.getItem("flight"));
+    const bookingDetails = JSON.parse(window.sessionStorage.getItem("bookingDetails")); 
+    const seatsEconomyBooked = JSON.parse(window.sessionStorage.getItem("seatsEconomyBooked")); 
+    const seatsBussinessBooked = JSON.parse(window.sessionStorage.getItem("seatsBussinessBooked")); 
+    
     const [state, updateState] = React.useState();
     const forceUpdate = React.useCallback(() => updateState({}), []);
 
     const [passengerSeats, setPassengerSeats]= useState([]);
     const [count, setCount]= useState(-1);
-    const [passengerList,setPassengerList]=useState(props.passengerList);
-    const [temporaryData, setTemporaryData]=useState(props.passengerList)
+    const [passengerList,setPassengerList]=useState(bookingDetails.passenger);
+    const [temporaryData, setTemporaryData]=useState(bookingDetails.passenger)
 
     const [amount, setAmount] = useState(1000);
     const [paymentDetails, setPaymentDetails] = useState({})
@@ -47,7 +53,7 @@ const CheckInPage = (props) => {
 
     const CheckinHandler=(values)=>{
         console.log(values)
-        let data=props.passengerList
+        let data=bookingDetails.passenger
         let count=0
          data.forEach(element => {
           console.log(element)
@@ -55,6 +61,7 @@ const CheckInPage = (props) => {
           count+=1
          });
          setPassengerList(data)
+         console.log(passengerList);
          
       }
 
@@ -125,6 +132,18 @@ const CheckInPage = (props) => {
     }
 
 
+    
+    console.log(flightDetails.route);
+    useEffect(() => {
+        if(window.sessionStorage.getItem("checkInDetails")){
+
+        }
+        else{
+            window.location.href = "/";
+        }
+    }, [])
+
+
     return (
         <div>
             <nav class="navbar navbar1 navbar-expand-lg">
@@ -150,7 +169,15 @@ const CheckInPage = (props) => {
             <div className="Checkin bg-black-05">
                 <div class="cf ">
                     <div class="section1 fl w-100-m w-70-l pv3 ">
-                        <SearchResult />
+                        <SearchResult 
+                        departureTime={new Date(flightBooking.departureDateTime).toTimeString().slice(0, 5)}
+                        departureAirport={flightDetails.route.departureAirport}
+                        arrivalAirport={flightDetails.route.arrivalAirport}
+                        arrivalTime={new Date(flightBooking.arrivalDateTime).toTimeString().slice(0, 5)}
+                        totalFare={"₹ " + bookingDetails.payment.amount }
+                        totalTime={Math.ceil(flightBooking.totalTime / 60) + "hr " + flightBooking.totalTime % 60 + "min"}
+                        flightNumber={"BF" + flightDetails.flightNo}
+                         />
                         <div class="card card-body mb4">
                             {
                                 temporaryData.map(function (passenger) {
@@ -183,7 +210,8 @@ const CheckInPage = (props) => {
                         <div class="collapse" id="collapseExample2">
                             <div class="card  card1 card-body mb-4">
 
-                                <Seat seatsBooked={props.seatsBooked} passengers={props.passengers} type={props.type} checkin={CheckinHandler}/>
+                                {/* <Seat seatsBooked={props.seatsBooked} passengers={props.passengers} type={props.type} checkin={CheckinHandler}/> */}
+                                <Seat seatsBooked={bookingDetails.seatClass == "economy" ? seatsEconomyBooked : seatsBussinessBooked } passengers={bookingDetails.passenger} type={bookingDetails.seatClass} checkin={CheckinHandler}/>
                                 <button className="w-100 btn btn-primary" onClick={seatConfirmHandler} data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"> Confirm</button>
                             </div>
                         </div>
