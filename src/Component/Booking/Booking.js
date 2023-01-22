@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getGstAmount, orderDetails } from "../../Service/AuthService";
+import { bookFlight, getGstAmount, orderDetails } from "../../Service/AuthService";
 import SearchResult from "../Search/SearchResult";
 import useRazorpay from "react-razorpay";
 import { ToastContainer } from "react-toastify";
@@ -25,8 +25,6 @@ const Booking = () => {
     })
 
     const [flightFare, setFlightFare] = useState({});
-
-    const [paymentDetails, setPaymentDetails] = useState({})
 
     const Razorpay = useRazorpay();
 
@@ -80,15 +78,41 @@ const Booking = () => {
 
     const razorBtnHandler = (e) => {
         e.preventDefault()
-        let data = {
-            pnr: makeid(6),
+        let bookingData = {
+            pnrNo: makeid(6),
             bookingDate: new Date(),
             seatClass: JSON.parse(localStorage.getItem("searchDetails")).seatClass,
-            flightBooking: {},
+            flightBooking: {
+                "id" : JSON.parse(localStorage.getItem("flightDetails")).flightBookingId,
+                "departureDateTime" : JSON.parse(localStorage.getItem("flightDetails")).departureDateTime,
+                "arrivalDateTime" :  JSON.parse(localStorage.getItem("flightDetails")).arrivalDateTime,
+                "totalTime": JSON.parse(localStorage.getItem("flightDetails")).totalTime
+            },
             payment: {},
-            passenger: []
+            passenger: passenger
         }
 
+        
+        let returnBookingData
+        if (localStorage.getItem("returnflightDetails") && localStorage.getItem("returnflightDetails") !== "") {
+            returnBookingData = {
+                pnrNo: makeid(6),
+                bookingDate: new Date(),
+                seatClass: JSON.parse(localStorage.getItem("searchDetails")).seatClass,
+                flightBooking: {
+                    "id" : JSON.parse(localStorage.getItem("returnflightDetails")).flightBookingId,
+                    "departureDateTime" : JSON.parse(localStorage.getItem("returnflightDetails")).departureDateTime,
+                    "arrivalDateTime" :  JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime,
+                    "totalTime": JSON.parse(localStorage.getItem("returnflightDetails")).totalTime
+                },
+                payment: {},
+                passenger: passenger
+           }
+        }
+
+        console.log(returnBookingData ? returnBookingData : "Nope");
+
+        
 
         console.log("Paytm Started");
         const orderInfo = {
@@ -109,9 +133,7 @@ const Booking = () => {
                     alert(response.razorpay_payment_id);
                     alert(response.razorpay_order_id);
                     alert(response.razorpay_signature);
-                    setPaymentDetails(response);
                     console.log(response);
-                    console.log(paymentDetails);
                     swal({
                         title: "Success",
                         text: "Successfull Payment",
@@ -119,7 +141,56 @@ const Booking = () => {
                         confirmButtonText: "OK",
                     }).then(function () {
                         // Redirect the user
-                        window.location = "/booking/successful";
+                        bookingData.payment = {
+                            "paymentId" : response.payment_Id,
+                            "paymentOrderId" : response.razorpay_order_id,
+                            "razorpaySignature": response.razorpay_signature,
+                            "paymentStatus":"success",
+                            "paymentDate": new Date(),
+                            "amount": amount
+                        }
+                        console.log(bookingData);
+                        console.log(returnBookingData);
+                        
+                        //Book a flight for going 
+                        bookFlight(bookingData).then( (bookedDetails) => {
+
+                            console.log("Go Flight booked Details", bookedDetails);
+                            window.sessionStorage.setItem("bookedDetails", JSON.stringify(bookedDetails));
+                            
+                            if(returnBookingData){
+                                
+                                returnBookingData.payment = {
+                                    "paymentId" : response.payment_Id,
+                                    "paymentOrderId" : response.razorpay_order_id,
+                                    "razorpaySignature": response.razorpay_signature,
+                                    "paymentStatus":"success",
+                                    "paymentDate": new Date(),
+                                    "amount": amount
+                                }
+
+                                //Book a flight for a return
+                                bookFlight(returnBookingData).then( (returnBookedDetails) => {
+
+                                    window.sessionStorage.setItem("returnbookedDetails", JSON.stringify(returnBookedDetails));
+                                    window.location = "/booking/successful";    
+                                
+                                }).catch((error) => {
+                                    window.localStorage.clear();
+                                    window.sessionStorage.clear();
+                                    console.log(error);
+                                })
+                            }
+                            else{
+                                window.location = "/booking/successful";
+                            }
+                            
+                        }).catch((error) => {
+                            window.localStorage.clear();
+                            window.sessionStorage.clear();
+                            console.log(error);
+                        })
+                        
                     })
                 },
                 prefill: {
@@ -131,7 +202,7 @@ const Booking = () => {
                     address: "BrownFeild Talawde Office",
                 },
                 theme: {
-                    color: "#3399cc",
+                    color: "#3A0210",
                 },
             };
 
@@ -229,6 +300,7 @@ const Booking = () => {
 
                     //Set Total Amount for Razorpay Payment
                     setAmount(flightFare.totalFare + flightFare.cgst + flightFare.sgst)
+                    window.sessionStorage.setItem("fareDetails", JSON.stringify(flightFare));
                 })
 
             }
@@ -240,7 +312,8 @@ const Booking = () => {
             navigate("/")
         }
 
-    }, [])
+    }, [amount])
+
 
     return (
         <div>

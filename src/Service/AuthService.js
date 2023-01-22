@@ -4,7 +4,7 @@ import setTimeout  from "react";
 
 //Get The Token
 const sitelink="http://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
-//const sitelink="http://localhost:9969"
+// const sitelink="http://localhost:9969"
 
 const authService = async (JwtData) => {
     await fetch(`${sitelink}/token`, {
@@ -125,6 +125,23 @@ const getGstAmount = async (totalFare, seatClass) =>{
     return data
 }
 
+const bookFlight = async(bookingDetails) => {
+  let data=await axios.post(`${sitelink}/book/bookFlight`, bookingDetails).then(
+    res => {
+      console.log(res.data);
+      return res.data
+    }
+    ).catch(error=>{
+      toast.error("Booking Failed");
+      toast.info("If ammount is deducted then it will be refunded soon");
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      setTimeout(window.location = "/", 60000);
+      console.log(error);
+    })
+    return data
+}
+
 // Checkin Functions 
 
 const getDetailsByPnr = async (pnr) => {
@@ -142,4 +159,4 @@ const getDetailsByPnr = async (pnr) => {
 }
 
 
-  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount, getDetailsByPnr};
+  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount,bookFlight, getDetailsByPnr};
