@@ -27,6 +27,10 @@ const CheckInPage = (props) => {
     const [passengerList,setPassengerList]=useState(bookingDetails.passenger);
     const [temporaryData, setTemporaryData]=useState(bookingDetails.passenger)
 
+    const [checkinDetails,setCheckinDetails]=useState({
+        
+    })
+
     const [amount, setAmount] = useState(1000);
     const [paymentDetails, setPaymentDetails] = useState({})
     const [allSeatFare, setAllSeatFare] = useState({});

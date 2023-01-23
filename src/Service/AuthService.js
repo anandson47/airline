@@ -168,6 +168,7 @@ const getDetailsByPnr = async (checkinDetails) => {
   let data=await axios.post(`${checkinlink}/checkin/validatePnr`, checkinDetails).then(
     res => {
       console.log(res.data);
+      
       return res.data
     }
     ).catch(error=>{
