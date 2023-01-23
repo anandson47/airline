@@ -7,7 +7,7 @@ import SearchResult from "../Search/SearchResult";
 import Passenger from "./Passenger";
 import TermsAndConditions from "./TermsAndConditions";
 import confirm from "./confirm.png"
-import { orderDetails } from "../../Service/AuthService";
+import { orderDetails, seatFare } from "../../Service/AuthService";
 import swal from "sweetalert";
 import useRazorpay from "react-razorpay";
 
@@ -29,6 +29,34 @@ const CheckInPage = (props) => {
 
     const [amount, setAmount] = useState(1000);
     const [paymentDetails, setPaymentDetails] = useState({})
+    const [allSeatFare, setAllSeatFare] = useState({});
+    const [selectedSeatFare, setSelectedSeatFare] = useState({
+        "totalFare" : 0,
+        "cgst" : 0,
+        "sgst" : 0,
+        "payAmount": 0
+    });
+
+    //Function to Convert Seat String to seat number
+    const getSeatNo = (seatStr) => {
+        let row = seatStr.slice(0, seatStr.length - 1)
+        let col = seatStr[seatStr.length - 1]
+        if(row > 6){
+            //Economy
+            const getCols = {
+                "A" : 1, "B" : 2, "C" : 3, "D" : 4, "E" : 5, "F" : 6 
+            }
+            let seatNum = 20 + (row - 6)*6 + getCols[col]
+            return seatNum
+        }
+        else{
+            const getCols = {
+                "A" : 1, "B" : 2, "C" : 3, "D" : 4
+            }
+            let seatNum = (row - 1)*4 + getCols[col];
+            return seatNum;
+        }
+    }
 
     const Razorpay = useRazorpay();
 
@@ -55,13 +83,20 @@ const CheckInPage = (props) => {
         console.log(values)
         let data=bookingDetails.passenger
         let count=0
+        let currentFare = 0
          data.forEach(element => {
           console.log(element)
-          element.seat=values[count]
+          element.seatNo=getSeatNo(values[count])
+          console.log(getSeatNo(values[count]));
+          currentFare += allSeatFare[getSeatNo(values[count])]
           count+=1
          });
          setPassengerList(data)
-         console.log(passengerList);
+        //  console.log(passengerList);
+
+        selectedSeatFare.totalFare = currentFare;
+        console.log("Current Fare" , currentFare);
+         
          
       }
 
@@ -137,6 +172,11 @@ const CheckInPage = (props) => {
     useEffect(() => {
         if(window.sessionStorage.getItem("checkInDetails")){
 
+            seatFare(flightBooking.id).then( (data) => {
+                setAllSeatFare(data);
+            })
+            console.log(allSeatFare);
+        
         }
         else{
             window.location.href = "/";
@@ -211,7 +251,7 @@ const CheckInPage = (props) => {
                             <div class="card  card1 card-body mb-4">
 
                                 {/* <Seat seatsBooked={props.seatsBooked} passengers={props.passengers} type={props.type} checkin={CheckinHandler}/> */}
-                                <Seat seatsBooked={bookingDetails.seatClass == "economy" ? seatsEconomyBooked : seatsBussinessBooked } passengers={bookingDetails.passenger} type={bookingDetails.seatClass} checkin={CheckinHandler}/>
+                                <Seat allSeatFare = {allSeatFare} seatsBooked={bookingDetails.seatClass == "economy" ? seatsEconomyBooked : seatsBussinessBooked } passengers={bookingDetails.passenger} type={bookingDetails.seatClass} checkin={CheckinHandler}/>
                                 <button className="w-100 btn btn-primary" onClick={seatConfirmHandler} data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"> Confirm</button>
                             </div>
                         </div>
@@ -236,7 +276,7 @@ const CheckInPage = (props) => {
                                         Seat Fare:
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025 ">
-                                    ₹ 300
+                                    ₹ {selectedSeatFare.totalFare}
                                     </div>
                                 </div>
                                 <div class="cf">
@@ -244,7 +284,7 @@ const CheckInPage = (props) => {
                                         Central GST
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                    ₹ 54
+                                    ₹ {selectedSeatFare.cgst}
                                     </div>
                                 </div>
                                 <div class="cf">
@@ -252,7 +292,7 @@ const CheckInPage = (props) => {
                                         State GST
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                    ₹ 54
+                                    ₹ {selectedSeatFare.sgst}
                                     </div>
                                 </div>
                                 <hr/>
@@ -261,7 +301,7 @@ const CheckInPage = (props) => {
                                        Total Payable 
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                    ₹ 408
+                                    ₹ {selectedSeatFare.payAmount}
                                     </div>
                                 </div>
                                 <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>

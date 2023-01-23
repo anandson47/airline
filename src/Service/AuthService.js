@@ -142,6 +142,24 @@ const bookFlight = async(bookingDetails) => {
     return data
 }
 
+//Get the Seat Fare Details 
+const seatFare = async (flightId) => {
+  let data=await axios.get(`${sitelink}/fare/listAllSeatFares/${flightId}`).then(
+    res => {
+      //console.log(res.data);
+      return res.data
+    }
+    ).catch(error=>{
+      toast.error("Failed to get the Seat Fares");
+      toast.info("If ammount is deducted then it will be refunded soon");
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      setTimeout(window.location = "/", 60000);
+      console.log(error);
+    })
+    return data;
+}
+
 // Checkin Functions 
 
 // const checkinlink="http://ec2-3-110-171-177.ap-south-1.compute.amazonaws.com:9900"
@@ -160,4 +178,4 @@ const getDetailsByPnr = async (checkinDetails) => {
 }
 
 
-  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount,bookFlight, getDetailsByPnr};
+  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount,bookFlight, seatFare, getDetailsByPnr};
