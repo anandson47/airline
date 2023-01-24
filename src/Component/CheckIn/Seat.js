@@ -7,14 +7,12 @@ import { toast, ToastContainer } from "react-toastify";
 const Seat = (props) => {
 
     const [seatBooked, setSeatsBooked] = useState(props.seatsBooked)
-    //const [count, setCount] = useState(props.passengers.length)
+    const [countPassenger, setCountPassenger] = useState(props.passengers.length)
     const [seatSelection, setSeatSelection] = useState(new Array());
     const [seatsDisplay, setSeatsDisplay] = useState();
 
     //This will have all the seats fare
     const [seatsFare, setSeatsFare] = useState();
-
-    var countPassenger = props.passengers.length
 
     const getSeatNumber = (seatNumber) => {
         if (seatNumber > 20) {
@@ -40,7 +38,7 @@ const Seat = (props) => {
         if (document.getElementById(e.target.id).style.backgroundColor === "lightgreen") {
             document.getElementById(seatselected).style.background = "none"
             // setCount(count + 1);
-            countPassenger += 1;
+            setCountPassenger(countPassenger + 1)
             seatSelection.splice(seatSelection.indexOf(getSeatNumber(seatselected), 1))
             console.log(seatSelection)
             props.checkin(seatSelection)
@@ -56,7 +54,7 @@ const Seat = (props) => {
         }
         else {
             document.getElementById(e.target.id).style.backgroundColor = "lightgreen"
-            countPassenger -= 1
+            setCountPassenger(countPassenger - 1)
             seatSelection.push(getSeatNumber(seatselected))
             props.checkin(seatSelection)
         }

@@ -58,6 +58,11 @@ const FlightTickets = () => {
             margin: "auto",
             flexDirection: "row"
         },
+        tableRow1: {
+            margin: "auto",
+            flexDirection: "row"
+
+        },
         tableCol: {
             width: "25%",
             borderStyle: "solid",
@@ -169,12 +174,12 @@ const FlightTickets = () => {
                             Arrival - {arrivalDate.toLocaleTimeString()}
                         </Text>
                     </View>
-                    <View>
+                    <View style={{color: "#3A0210"}}>
                         <Text>PNR Number: {bookedDetails.pnrNo}</Text>
                     </View>
                     <View style={styles.passengerDetails}>
                         <View style={styles.table}>
-                            <View style={styles.tableRow}>
+                            <View style={styles.tableRow1}>
                                 <View style={styles.tableCol}>
                                     <Text style={styles.tableCell}>First Name</Text>
                                 </View>

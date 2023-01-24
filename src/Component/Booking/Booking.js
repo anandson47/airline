@@ -369,7 +369,9 @@ const Booking = () => {
                             <input id="phoneNo" class="info fl w-30 tc pv3 bg-white" type="number" placeholder="Phone Number" required />
                             <input id="email" class="info fl w-30 tc pv3 bg-white" type="email" placeholder="Email" required />
                         </div>
-                        <button type="submit" className="btn btn-primary w-100">Confirm Details</button>
+                        <div className="tc">
+                            <button type="submit" className="w-60 pa2 fw5 search">Confirm Details</button>
+                        </div>
                     </form>
 
                 </div>
@@ -410,7 +412,7 @@ const Booking = () => {
                                     {"₹" + amount}
                                 </div>
                             </div>
-                            <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>
+                            <button class="mt3 btn btn-primary" onClick={razorBtnHandler}>Proceed to Pay</button>
 
                         </div>
                     </article>

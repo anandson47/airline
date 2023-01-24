@@ -1043,7 +1043,7 @@ const Search = (props) => {
                     }
                 </div>
                 <div className="tc pb5">
-                    <button className="btn btn-primary" onClick={onSubmitHandler}>Continue to booking</button>
+                    <button className="pa2 fw5 search" onClick={onSubmitHandler}>Continue to booking</button>
                 </div>
             </div>
             <ToastContainer

@@ -325,7 +325,7 @@ const CheckInPage = (props) => {
 
                                 {/* <Seat seatsBooked={props.seatsBooked} passengers={props.passengers} type={props.type} checkin={CheckinHandler}/> */}
                                 <Seat allSeatFare={allSeatFare} seatsBooked={bookingDetails.seatClass == "economy" ? seatsEconomyBooked : seatsBussinessBooked} passengers={bookingDetails.passenger} type={bookingDetails.seatClass} checkin={CheckinHandler} />
-                                <button className="w-100 btn btn-primary" onClick={seatConfirmHandler} data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"> Confirm</button>
+                                <button className="w-100 pa2 fw5 search" onClick={seatConfirmHandler} data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"> Confirm</button>
                             </div>
                         </div>
                         <p className="w-100 bg-white">
@@ -377,7 +377,7 @@ const CheckInPage = (props) => {
                                         ₹ {selectedSeatFare.payAmount}
                                     </div>
                                 </div>
-                                <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>
+                                <button class="mt3 btn btn-primary" onClick={razorBtnHandler}>Proceed to Pay</button>
                             </div>
                         </article>
                     </div>
