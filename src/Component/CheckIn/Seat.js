@@ -62,22 +62,7 @@ const Seat = (props) => {
         }
     }
 
-    useEffect(() => {
-        props.seatsBooked.forEach(element => {
-            document.getElementById(element).style.backgroundColor = "gray"
-        });
-        // if (props.type === "business") {
-        //     document.getElementById("economy").style.display = "none"
-        // }
-        // else {
-        //     document.getElementById("business").style.display = "none"
-        // }
-
-        seatDisplayPage();
-        console.log(seatBooked);
-        setSeatsFare(props.allSeatFare);
-        console.log(props.allSeatFare);
-    }, [props.allSeatFare])
+    
 
 
     const seatDisplayPage = () => {
@@ -185,9 +170,37 @@ const Seat = (props) => {
         }
 
         setSeatsDisplay(dispSeat);
+
+        //Gray the one which are selected by the user
+        setTimeout(() => {
+            //This takes time to update the seats so kept in timeout
+            props.seatsBooked.forEach(element => {
+                document.getElementById(element).style.backgroundColor = "gray"
+            });
+        }, 2000)
+        
+
     }
 
 
+    useEffect(() => {
+        console.log(props.seatsBooked);
+        
+        // if (props.type === "business") {
+        //     document.getElementById("economy").style.display = "none"
+        // }
+        // else {
+        //     document.getElementById("business").style.display = "none"
+        // }
+
+        //Display all the seats
+        seatDisplayPage();
+        console.log(seatBooked);
+
+        setSeatsFare(props.allSeatFare);
+
+        console.log(props.allSeatFare);
+    }, [props.allSeatFare])
 
 
     return (

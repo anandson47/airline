@@ -103,8 +103,8 @@ const logoutUser = () => {
           return JSON.parse(JSON.stringify(res.data))
         }
         ).catch(error=>{
-          toast.error("Please try after some time");
-          setTimeout(window.location = "/", 3000);
+          toast.error("Create Order Failed. Try After Some Time");
+          //setTimeout(window.location = "/", 3000);
           console.log(error);
     })
     return data
@@ -179,4 +179,17 @@ const getDetailsByPnr = async (checkinDetails) => {
 }
 
 
-  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount,bookFlight, seatFare, getDetailsByPnr};
+const checkInSuccess = async (checkinDetails) => {
+  let data = await axios.post(`${sitelink}/checkin/checkInSuccess`, checkinDetails).then(
+    res => {
+      console.log(res.data);
+      
+      return res.data
+    }
+    ).catch(error=>{
+      toast.error("Please enter correct credentials");
+      console.log(error);
+    })
+    return data
+}
+  export { authService , userDetails , signup , logoutUser, orderDetails, getGstAmount,bookFlight, seatFare, getDetailsByPnr, checkInSuccess};

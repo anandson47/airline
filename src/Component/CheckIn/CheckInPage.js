@@ -7,37 +7,39 @@ import SearchResult from "../Search/SearchResult";
 import Passenger from "./Passenger";
 import TermsAndConditions from "./TermsAndConditions";
 import confirm from "./confirm.png"
-import { orderDetails, seatFare } from "../../Service/AuthService";
+import { checkInSuccess, getGstAmount, orderDetails, seatFare } from "../../Service/AuthService";
 import swal from "sweetalert";
 import useRazorpay from "react-razorpay";
+import { toast, ToastContainer } from "react-toastify";
 
 const CheckInPage = (props) => {
 
-    const flightBooking =  JSON.parse(window.sessionStorage.getItem("flightBooking"));
+    const flightBooking = JSON.parse(window.sessionStorage.getItem("flightBooking"));
     const flightDetails = JSON.parse(window.sessionStorage.getItem("flight"));
-    const bookingDetails = JSON.parse(window.sessionStorage.getItem("bookingDetails")); 
-    const seatsEconomyBooked = JSON.parse(window.sessionStorage.getItem("seatsEconomyBooked")); 
-    const seatsBussinessBooked = JSON.parse(window.sessionStorage.getItem("seatsBussinessBooked")); 
-    
+    const bookingDetails = JSON.parse(window.sessionStorage.getItem("bookingDetails"));
+    const seatsEconomyBooked = JSON.parse(window.sessionStorage.getItem("seatsEconomyBooked"));
+    const seatsBussinessBooked = JSON.parse(window.sessionStorage.getItem("seatsBussinessBooked"));
+    const checkInDetials = JSON.parse(window.sessionStorage.getItem("checkInDetails"));
+
     const [state, updateState] = React.useState();
     const forceUpdate = React.useCallback(() => updateState({}), []);
 
-    const [passengerSeats, setPassengerSeats]= useState([]);
-    const [count, setCount]= useState(-1);
-    const [passengerList,setPassengerList]=useState(bookingDetails.passenger);
-    const [temporaryData, setTemporaryData]=useState(bookingDetails.passenger)
+    const [passengerSeats, setPassengerSeats] = useState([]);
+    const [count, setCount] = useState(-1);
+    const [passengerList, setPassengerList] = useState(bookingDetails.passenger);
+    const [temporaryData, setTemporaryData] = useState(bookingDetails.passenger)
 
-    const [checkinDetails,setCheckinDetails]=useState({
-        
-    })
+    // const [checkinDetails,setCheckinDetails]=useState({
+
+    // })
 
     const [amount, setAmount] = useState(1000);
     const [paymentDetails, setPaymentDetails] = useState({})
     const [allSeatFare, setAllSeatFare] = useState({});
     const [selectedSeatFare, setSelectedSeatFare] = useState({
-        "totalFare" : 0,
-        "cgst" : 0,
-        "sgst" : 0,
+        "totalFare": 0,
+        "cgst": 0,
+        "sgst": 0,
         "payAmount": 0
     });
 
@@ -45,67 +47,113 @@ const CheckInPage = (props) => {
     const getSeatNo = (seatStr) => {
         let row = seatStr.slice(0, seatStr.length - 1)
         let col = seatStr[seatStr.length - 1]
-        if(row > 6){
+        if (row > 6) {
             //Economy
             const getCols = {
-                "A" : 1, "B" : 2, "C" : 3, "D" : 4, "E" : 5, "F" : 6 
+                "A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6
             }
-            let seatNum = 20 + (row - 6)*6 + getCols[col]
+            let seatNum = 20 + (row - 6) * 6 + getCols[col]
             return seatNum
         }
-        else{
+        else {
             const getCols = {
-                "A" : 1, "B" : 2, "C" : 3, "D" : 4
+                "A": 1, "B": 2, "C": 3, "D": 4
             }
-            let seatNum = (row - 1)*4 + getCols[col];
+            let seatNum = (row - 1) * 4 + getCols[col];
             return seatNum;
+        }
+    }
+
+    //Number to String format
+    const getSeatNumber = (seatNumber) => {
+        if (seatNumber > 20) {
+            let seat_row = Math.ceil((seatNumber - 20) / 6) + 5
+            let column = ["A", "B", "C", "D", "E", "F"]
+            let seat_column = column[((seatNumber - 21) % 6)]
+            return seat_row + seat_column
+
+        }
+        else {
+            let seat_row = Math.ceil((seatNumber) / 4)
+            let column = ["D", "A", "B", "C"]
+            let seat_column = column[((seatNumber) % 4)]
+            return seat_row + seat_column
+
         }
     }
 
     const Razorpay = useRazorpay();
 
-    const checkAcknowlegdement=(yes)=>{
+    const checkAcknowlegdement = (yes) => {
         console.log(yes)
-        if(yes){
-            document.getElementById("acknowledgement").style.display="inline-flex";
+        if (yes) {
+            document.getElementById("acknowledgement").style.display = "inline-flex";
         }
-        else{
-            document.getElementById("acknowledgement").style.display="none";
+        else {
+            document.getElementById("acknowledgement").style.display = "none";
         }
     }
 
-    const seatConfirmHandler=(e)=>{
-        document.getElementById("seat-image").style.display="inline-flex";
+    const seatConfirmHandler = (e) => {
+
+        var passCnt = 0;
+        passengerList.forEach((passenger) => {
+            if (passenger.seatNo && passenger.seatNo !== "") {
+                passCnt += 1
+            }
+        })
+
+        if (passCnt != Object.keys(passengerList).length) {
+            toast.error("Please Select Seats for the Passenger");
+            return;
+        }
+        document.getElementById("seat-image").style.display = "inline-flex";
         setTemporaryData([])
         setTemporaryData(passengerList)
         console.log(temporaryData)
-        forceUpdate()
-        
+        //forceUpdate()
+
+        //Update the GST details of the Fare Details
+        getGstAmount(selectedSeatFare.totalFare, bookingDetails.seatClass).then((data) => {
+            selectedSeatFare.cgst = data;
+            selectedSeatFare.sgst = data;
+            selectedSeatFare.payAmount = data * 2 + selectedSeatFare.totalFare
+            setAmount(selectedSeatFare.payAmount)
+        })
+
+
     }
 
-    const CheckinHandler=(values)=>{
-        console.log(values)
-        let data=bookingDetails.passenger
-        let count=0
+    const CheckinHandler = (values) => {
+        console.log(values[0])
+        let data = bookingDetails.passenger
+        let count = 0
         let currentFare = 0
-         data.forEach(element => {
-          console.log(element)
-          element.seatNo=getSeatNo(values[count])
-          console.log(getSeatNo(values[count]));
-          currentFare += allSeatFare[getSeatNo(values[count])]
-          count+=1
-         });
-         setPassengerList(data)
+        data.forEach(element => {
+            console.log(element)
+            if(values[count]){
+                element.seatNo = getSeatNo(values[count])
+                console.log(getSeatNo(values[count]));
+                currentFare += allSeatFare[getSeatNo(values[count]) - 1]
+                console.log(allSeatFare);
+            }
+            count += 1
+        });
+        setPassengerList(data)
         //  console.log(passengerList);
 
-        selectedSeatFare.totalFare = currentFare;
-        console.log("Current Fare" , currentFare);
-         
-         
-      }
+        setSelectedSeatFare(prevState => ({
+            ...prevState, 
+            totalFare : currentFare
+        }))
+        console.log(selectedSeatFare);
+        console.log("Current Fare", currentFare);
 
-      //Payment Code
-      const razorBtnHandler = () => {
+
+    }
+
+    //Payment Code
+    const razorBtnHandler = () => {
 
         console.log("Paytm Started");
         const orderInfo = {
@@ -135,7 +183,29 @@ const CheckInPage = (props) => {
                         confirmButtonText: "OK",
                     }).then(function () {
                         // Redirect the user
-                        window.location.href = "/booking/successful";
+                        checkInDetials.payment = {
+                            "paymentId": response.payment_Id,
+                            "paymentOrderId": response.razorpay_order_id,
+                            "razorpaySignature": response.razorpay_signature,
+                            "paymentStatus": "success",
+                            "paymentDate": new Date(),
+                            "amount": amount
+                        }
+
+                        var checkInfo = {
+                            "checkin": checkInDetials,
+                            "passengers": passengerList
+                        }
+                        checkInSuccess(checkInfo).then((checIndata) => {
+                            console.log(data);
+                            toast.success("Successfully CheckedIn");
+                            window.sessionStorage.setItem("checkInDetails", checIndata);
+                            window.location.href = "/checkin/successful";
+                        }).catch((error) => {
+                            console.log(error);
+
+                        })
+                        //window.location.href = "/booking/successful";
                     })
                 },
                 prefill: {
@@ -171,21 +241,21 @@ const CheckInPage = (props) => {
     }
 
 
-    
+
     console.log(flightDetails.route);
     useEffect(() => {
-        if(window.sessionStorage.getItem("checkInDetails")){
+        if (window.sessionStorage.getItem("checkInDetails")) {
 
-            seatFare(flightBooking.id).then( (data) => {
+            seatFare(flightBooking.id).then((data) => {
                 setAllSeatFare(data);
             })
             console.log(allSeatFare);
-        
+
         }
-        else{
+        else {
             window.location.href = "/";
         }
-    }, [])
+    }, [temporaryData, selectedSeatFare, amount])
 
 
     return (
@@ -213,33 +283,33 @@ const CheckInPage = (props) => {
             <div className="Checkin bg-black-05">
                 <div class="cf ">
                     <div class="section1 fl w-100-m w-70-l pv3 ">
-                        <SearchResult 
-                        departureTime={new Date(flightBooking.departureDateTime).toTimeString().slice(0, 5)}
-                        departureAirport={flightDetails.route.departureAirport}
-                        arrivalAirport={flightDetails.route.arrivalAirport}
-                        arrivalTime={new Date(flightBooking.arrivalDateTime).toTimeString().slice(0, 5)}
-                        totalFare={"₹ " + bookingDetails.payment.amount }
-                        totalTime={Math.ceil(flightBooking.totalTime / 60) + "hr " + flightBooking.totalTime % 60 + "min"}
-                        flightNumber={"BF" + flightDetails.flightNo}
-                         />
+                        <SearchResult
+                            departureTime={new Date(flightBooking.departureDateTime).toTimeString().slice(0, 5)}
+                            departureAirport={flightDetails.route.departureAirport}
+                            arrivalAirport={flightDetails.route.arrivalAirport}
+                            arrivalTime={new Date(flightBooking.arrivalDateTime).toTimeString().slice(0, 5)}
+                            totalFare={"₹ " + bookingDetails.payment.amount}
+                            totalTime={Math.ceil(flightBooking.totalTime / 60) + "hr " + flightBooking.totalTime % 60 + "min"}
+                            flightNumber={"BF" + flightDetails.flightNo}
+                        />
                         <div class="card card-body mb4">
                             {
                                 temporaryData.map(function (passenger) {
                                     console.log(passenger)
-                                    return  <div class="cf w-100 center">
-                                    <div class=" central fl w-10 tc pv3 bg-white">
-                                        Passenger Details:
+                                    return <div class="cf w-100 center">
+                                        <div class=" central fl w-10 tc pv3 bg-white">
+                                            Passenger Details:
+                                        </div>
+                                        <div class="info fl w-30 tc pv3 bg-white">
+                                            {passenger.firstName.toUpperCase() + " " + passenger.lastName.toUpperCase()}
+                                        </div>
+                                        <div class="info fl w-30 tc pv3 bg-white">
+                                            {passenger.gender}
+                                        </div>
+                                        <div class="info fl w-10 tc pv3 bg-white" id={count}>
+                                            {passenger.seatNo ? getSeatNumber(passenger.seatNo) : ""}
+                                        </div>
                                     </div>
-                                    <div class="info fl w-30 tc pv3 bg-white">
-                                        {passenger.firstName.toUpperCase() + " " + passenger.lastName.toUpperCase()}
-                                    </div>
-                                    <div class="info fl w-30 tc pv3 bg-white">
-                                        {passenger.gender}
-                                    </div>
-                                    <div class="info fl w-10 tc pv3 bg-white" id={count}>
-                                        {passenger.seat}
-                                    </div>
-                                </div> 
                                 })
                             }
                         </div>
@@ -255,7 +325,7 @@ const CheckInPage = (props) => {
                             <div class="card  card1 card-body mb-4">
 
                                 {/* <Seat seatsBooked={props.seatsBooked} passengers={props.passengers} type={props.type} checkin={CheckinHandler}/> */}
-                                <Seat allSeatFare = {allSeatFare} seatsBooked={bookingDetails.seatClass == "economy" ? seatsEconomyBooked : seatsBussinessBooked } passengers={bookingDetails.passenger} type={bookingDetails.seatClass} checkin={CheckinHandler}/>
+                                <Seat allSeatFare={allSeatFare} seatsBooked={bookingDetails.seatClass == "economy" ? seatsEconomyBooked : seatsBussinessBooked} passengers={bookingDetails.passenger} type={bookingDetails.seatClass} checkin={CheckinHandler} />
                                 <button className="w-100 btn btn-primary" onClick={seatConfirmHandler} data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample"> Confirm</button>
                             </div>
                         </div>
@@ -280,7 +350,7 @@ const CheckInPage = (props) => {
                                         Seat Fare:
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025 ">
-                                    ₹ {selectedSeatFare.totalFare}
+                                        ₹ {selectedSeatFare.totalFare}
                                     </div>
                                 </div>
                                 <div class="cf">
@@ -288,7 +358,7 @@ const CheckInPage = (props) => {
                                         Central GST
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                    ₹ {selectedSeatFare.cgst}
+                                        ₹ {selectedSeatFare.cgst}
                                     </div>
                                 </div>
                                 <div class="cf">
@@ -296,16 +366,16 @@ const CheckInPage = (props) => {
                                         State GST
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                    ₹ {selectedSeatFare.sgst}
+                                        ₹ {selectedSeatFare.sgst}
                                     </div>
                                 </div>
-                                <hr/>
+                                <hr />
                                 <div class="cf">
                                     <div class="fl w-50 tc pv1 bg-black-05">
-                                       Total Payable 
+                                        Total Payable
                                     </div>
                                     <div class="fl w-20 tr pv1 bg-black-025">
-                                    ₹ {selectedSeatFare.payAmount}
+                                        ₹ {selectedSeatFare.payAmount}
                                     </div>
                                 </div>
                                 <button class="btn btn-primary mt3" onClick={razorBtnHandler}>Proceed to Pay</button>
@@ -314,6 +384,17 @@ const CheckInPage = (props) => {
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                theme="dark"
+            />
         </div>
     )
 }

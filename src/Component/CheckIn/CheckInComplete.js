@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import logo from "./logo.png";
 import tick from "./confirm.png"
 import "./CheckInComplete.css"
@@ -7,6 +7,16 @@ import Barcode from "react-barcode"
 
 const CheckInComplete = () => {
 
+    const checkInDetails = window.sessionStorage.getItem("checkInDetails");
+    
+    useEffect( () => {
+        if(checkInDetails && checkInDetails.checkiniId){
+            console.log("Hii");
+        }
+        else{
+            window.location.href = "/";
+        }
+    }, [])
     return (
         <div className="CheckInDone">
             <nav class="navbar navbar1 navbar-expand-lg">
