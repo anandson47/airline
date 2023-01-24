@@ -197,9 +197,8 @@ const CheckInPage = (props) => {
                             "passengers": passengerList
                         }
                         checkInSuccess(checkInfo).then((checIndata) => {
-                            console.log(data);
                             toast.success("Successfully CheckedIn");
-                            window.sessionStorage.setItem("checkInDetails", checIndata);
+                            window.sessionStorage.setItem("checkInDetails", JSON.stringify(checIndata));
                             window.location.href = "/checkin/successful";
                         }).catch((error) => {
                             console.log(error);

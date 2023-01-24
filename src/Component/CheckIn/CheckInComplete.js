@@ -7,10 +7,11 @@ import Barcode from "react-barcode"
 
 const CheckInComplete = () => {
 
-    const checkInDetails = window.sessionStorage.getItem("checkInDetails");
+    const checkInDetails = JSON.parse(window.sessionStorage.getItem("checkInDetails"));
+    const bookingDetails = JSON.parse(window.sessionStorage.getItem("bookingDetails"));
     
     useEffect( () => {
-        if(checkInDetails && checkInDetails.checkiniId){
+        if(checkInDetails && checkInDetails.checkinId){
             console.log("Hii");
         }
         else{
@@ -50,7 +51,7 @@ const CheckInComplete = () => {
                         <button data-bs-toggle="modal" data-bs-target="#boardingpass" className="f6 link dim br2 ba bw1 ph3 pv2 mb2 dib black"><img src="/assets/images/boardingpass.png" className="w-20"/></button> <br/>Get your Boarding Pass here
                     </div>
                     <div class="fl w-50 tc pv5 bg-black-025">
-                        <button className="f6 link dim br2 ba bw1 ph3 pv2 mb2 dib black"><Barcode className="w-30" value="PNR+LastName"/></button><br/>Take a photo of the above barcode for your baggage tag
+                        <button className="f6 link dim br2 ba bw1 ph3 pv2 mb2 dib black"><Barcode className="w-30" text = {"Take a photo of the above barcode for your baggage tag"}  value={bookingDetails.pnrNo }/></button><br/><a className="link dim pointer" target="_blank" href="https://capg-train.s3.ap-south-1.amazonaws.com/Baggage+Tag+tutorial.pdf">Baggage Barcode Guide</a>
                         
                     </div>
                 </div>
