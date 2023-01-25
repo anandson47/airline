@@ -184,6 +184,9 @@ const UserProfile = (props) => {
                                 totalTime={Math.floor(allBookings.flightBookings[index].totalTime / 60) + "hr " + allBookings.flightBookings[index].totalTime % 60 + " min"}
                                 flightNumber={"BF" + allBookings.flightDetails[index].flightNo}
                                 pnrNo={allBookings.bookingDetails[index].pnrNo}
+                                departureDateTime={allBookings.flightBookings[index].departureDateTime}
+                                arrivalDateTime={allBookings.flightBookings[index].arrivalDateTime} 
+                                checkedinMsg = {allBookings.checkinDetails[index] && allBookings.checkinDetails[index].payment !== null ? "Successfully CheckedIn" : ""}
                             />
                         ))
                     }
@@ -201,6 +204,8 @@ const UserProfile = (props) => {
                                 totalTime={Math.floor(checkInInfo.flightBookings[index].totalTime / 60) + "hr " + checkInInfo.flightBookings[index].totalTime % 60 + " min"}
                                 flightNumber={"BF" + checkInInfo.flightDetails[index].flightNo}
                                 pnrNo={checkInInfo.bookingDetails[index].pnrNo}
+                                departureDateTime={checkInInfo.flightBookings[index].departureDateTime} 
+                                arrivalDateTime={checkInInfo.flightBookings[index].arrivalDateTime}
                             />
                         ))
                     }
