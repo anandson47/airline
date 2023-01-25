@@ -7,9 +7,12 @@ const SearchResult = (props) => {
         <div class="search-card">
             <article id={props.flightNumber} class="card-search center w-90 br3 hidden ba b--black-100 mv2">
                 <div class="pa3">
+                    <div className="pnrNo">
+                        {props.pnrNo ? "PNR: "+props.pnrNo : ""}
+                    </div>
                     <div class="cf" >
                         <div class="fl w-30 w-10-l tc pt2 " >
-                            <h4>{props.departureTime}</h4>
+                            <h4>{props.departureTime}<br/></h4>
                             <p>{props.departureAirport}</p>
                         </div>
                         <div class="fl w-0 w-20-l dn dib-ns tc pt2 " >

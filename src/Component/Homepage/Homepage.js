@@ -766,7 +766,15 @@ const HomePage = (props) => {
     }
 
     useEffect(() => {
-
+        //On Page Load all Data will be cleared
+        const token = localStorage.getItem("token") ? localStorage.getItem("token") : ""
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+        
+        if(token && token !== ""){
+            window.localStorage.setItem("token", token);
+        }
+        
     }, [])
 
     return (

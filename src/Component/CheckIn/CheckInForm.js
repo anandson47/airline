@@ -52,7 +52,7 @@ const CheckInForm = () => {
                 <div class="inputs pt3">
                     <input type="text" placeholder="PNR Number" onChange={onPnrHandler}/>
                     <br/>
-                    <input type="password" placeholder="Email Address" onChange={onEmailHandler}/>
+                    <input type="text" placeholder="Email Address" onChange={onEmailHandler}/>
                 </div>
                 <br/><br/>
                 <div class="Login_signup ">
