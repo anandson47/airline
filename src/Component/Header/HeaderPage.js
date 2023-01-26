@@ -69,7 +69,7 @@ const HeaderPage = () => {
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <a class="dropdown-item" href="/">Dashboard</a>
-                                <a class="dropdown-item" href="#">Edit Profile</a>
+                                <a class="dropdown-item" href="/UserProfile">Edit Profile</a>
                                 <a class="dropdown-item" href="#" onClick={logout}>Log Out</a>
                             </div>
                         </li>
@@ -104,7 +104,6 @@ const HeaderPage = () => {
                     </div>
                 </div>
             </div>
-            <ToastContainer />
         </div>
     );
 }

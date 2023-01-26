@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { bookFlight, getGstAmount, orderDetails } from "../../Service/AuthService";
 import SearchResult from "../Search/SearchResult";
 import useRazorpay from "react-razorpay";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import swal from "sweetalert";
 import { useNavigate } from "react-router";
 import HeaderPage from "../Header/HeaderPage";
@@ -26,6 +26,7 @@ const Booking = () => {
     })
 
     const [flightFare, setFlightFare] = useState({});
+    const [contactFormSubmit, setContactFormSubmit] = useState(false);
 
     const Razorpay = useRazorpay();
 
@@ -68,10 +69,10 @@ const Booking = () => {
     }
 
     function makeid(length) {
-        var result           = '';
-        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         var charactersLength = characters.length;
-        for ( var i = 0; i < length; i++ ) {
+        for (var i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;
@@ -79,21 +80,27 @@ const Booking = () => {
 
     const razorBtnHandler = (e) => {
         e.preventDefault()
+
+        if (!contactFormSubmit) {
+            toast.info("Please fill Passenger and Contact Details");
+            return;
+        }
+
         let bookingData = {
             pnrNo: makeid(6),
             bookingDate: new Date(),
             seatClass: JSON.parse(localStorage.getItem("searchDetails")).seatClass,
             flightBooking: {
-                "id" : JSON.parse(localStorage.getItem("flightDetails")).flightBookingId,
-                "departureDateTime" : JSON.parse(localStorage.getItem("flightDetails")).departureDateTime,
-                "arrivalDateTime" :  JSON.parse(localStorage.getItem("flightDetails")).arrivalDateTime,
+                "id": JSON.parse(localStorage.getItem("flightDetails")).flightBookingId,
+                "departureDateTime": JSON.parse(localStorage.getItem("flightDetails")).departureDateTime,
+                "arrivalDateTime": JSON.parse(localStorage.getItem("flightDetails")).arrivalDateTime,
                 "totalTime": JSON.parse(localStorage.getItem("flightDetails")).totalTime
             },
             payment: {},
             passenger: passenger
         }
 
-        
+
         let returnBookingData
         if (localStorage.getItem("returnflightDetails") && localStorage.getItem("returnflightDetails") !== "") {
             returnBookingData = {
@@ -101,19 +108,19 @@ const Booking = () => {
                 bookingDate: new Date(),
                 seatClass: JSON.parse(localStorage.getItem("searchDetails")).seatClass,
                 flightBooking: {
-                    "id" : JSON.parse(localStorage.getItem("returnflightDetails")).flightBookingId,
-                    "departureDateTime" : JSON.parse(localStorage.getItem("returnflightDetails")).departureDateTime,
-                    "arrivalDateTime" :  JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime,
+                    "id": JSON.parse(localStorage.getItem("returnflightDetails")).flightBookingId,
+                    "departureDateTime": JSON.parse(localStorage.getItem("returnflightDetails")).departureDateTime,
+                    "arrivalDateTime": JSON.parse(localStorage.getItem("returnflightDetails")).arrivalDateTime,
                     "totalTime": JSON.parse(localStorage.getItem("returnflightDetails")).totalTime
                 },
                 payment: {},
                 passenger: passenger
-           }
+            }
         }
 
         console.log(returnBookingData ? returnBookingData : "Nope");
+        console.log(passenger)
 
-        
 
         console.log("Paytm Started");
         const orderInfo = {
@@ -121,6 +128,9 @@ const Booking = () => {
             "description": "Book Flight Payment"
         }
         orderDetails(orderInfo).then((data) => {
+
+            //Check if Contact Form Submitted or not
+
             const order = data
             const options = {
                 key: "rzp_test_pt82f4jFDDF6I0", // Enter the Key ID generated from the Dashboard
@@ -131,9 +141,9 @@ const Booking = () => {
                 image: "https://capg-train.s3.ap-south-1.amazonaws.com/logo.png",
                 order_id: order.id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
                 handler: function (response) {
-                    alert(response.razorpay_payment_id);
-                    alert(response.razorpay_order_id);
-                    alert(response.razorpay_signature);
+                    // alert(response.razorpay_payment_id);
+                    // alert(response.razorpay_order_id);
+                    // alert(response.razorpay_signature);
                     console.log(response);
                     swal({
                         title: "Success",
@@ -143,55 +153,55 @@ const Booking = () => {
                     }).then(function () {
                         // Redirect the user
                         bookingData.payment = {
-                            "paymentId" : response.payment_Id,
-                            "paymentOrderId" : response.razorpay_order_id,
+                            "paymentId": response.payment_Id,
+                            "paymentOrderId": response.razorpay_order_id,
                             "razorpaySignature": response.razorpay_signature,
-                            "paymentStatus":"success",
+                            "paymentStatus": "success",
                             "paymentDate": new Date(),
                             "amount": amount
                         }
                         console.log(bookingData);
                         console.log(returnBookingData);
-                        
+
                         //Book a flight for going 
-                        bookFlight(bookingData).then( (bookedDetails) => {
+                        bookFlight(bookingData).then((bookedDetails) => {
 
                             console.log("Go Flight booked Details", bookedDetails);
                             window.sessionStorage.setItem("bookedDetails", JSON.stringify(bookedDetails));
-                            
-                            if(returnBookingData){
-                                
+
+                            if (returnBookingData) {
+
                                 returnBookingData.payment = {
-                                    "paymentId" : response.payment_Id,
-                                    "paymentOrderId" : response.razorpay_order_id,
+                                    "paymentId": response.payment_Id,
+                                    "paymentOrderId": response.razorpay_order_id,
                                     "razorpaySignature": response.razorpay_signature,
-                                    "paymentStatus":"success",
+                                    "paymentStatus": "success",
                                     "paymentDate": new Date(),
                                     "amount": amount
                                 }
 
                                 //Book a flight for a return
-                                bookFlight(returnBookingData).then( (returnBookedDetails) => {
+                                bookFlight(returnBookingData).then((returnBookedDetails) => {
 
                                     window.sessionStorage.setItem("returnbookedDetails", JSON.stringify(returnBookedDetails));
-                                    window.location = "/booking/successful";    
-                                
+                                    window.location = "/booking/successful";
+
                                 }).catch((error) => {
                                     window.localStorage.clear();
                                     window.sessionStorage.clear();
                                     console.log(error);
                                 })
                             }
-                            else{
+                            else {
                                 window.location = "/booking/successful";
                             }
-                            
+
                         }).catch((error) => {
                             window.localStorage.clear();
                             window.sessionStorage.clear();
                             console.log(error);
                         })
-                        
+
                     })
                 },
                 prefill: {
@@ -248,9 +258,14 @@ const Booking = () => {
                 seatNo: "",
             }
         }
-        console.log(tempData)
+        console.log(passenger);
+        setContactFormSubmit(true);
+        toast.success("Details Updated Successfully");
     }
 
+    useEffect( () => {
+
+    }, [contactFormSubmit])
     useEffect(() => {
         passengerform()
         if (localStorage.getItem("flightDetails") !== "") {
@@ -318,7 +333,7 @@ const Booking = () => {
 
     return (
         <div>
-            <HeaderPage/>
+            <HeaderPage />
             <div class="cf ">
                 <div class="section1 fl w-100-m w-70-l pv3 ">
                     <SearchResult
@@ -394,7 +409,7 @@ const Booking = () => {
                                     {"₹" + amount}
                                 </div>
                             </div>
-                            <button class="mt3 btn btn-primary" onClick={razorBtnHandler}>Proceed to Pay</button>
+                            <button class="mt3 btn btn-primary " onClick={razorBtnHandler}>Proceed to Pay</button>
 
                         </div>
                     </article>

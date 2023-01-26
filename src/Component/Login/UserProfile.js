@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { logoutUser, userBookingDetails, userDetails, userReamaningCheckin } from "../../Service/AuthService"
+import CheckInForm from "../CheckIn/CheckInForm"
 import SearchResult from "../Search/SearchResult"
 import "./UserProfile.css"
 const UserProfile = (props) => {
@@ -209,6 +210,17 @@ const UserProfile = (props) => {
                             />
                         ))
                     }
+                </div>
+            </div>
+            <div class="modal" id="CheckIn" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <button type="button" class="btn-close modal-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-body">
+                            <CheckInForm />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
