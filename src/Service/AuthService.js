@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import setTimeout  from "react";
 
 //Get The Token
-const sitelink="http://ec2-13-232-62-130.ap-south-1.compute.amazonaws.com:9900/"
+const sitelink="http://ec2-13-232-62-130.ap-south-1.compute.amazonaws.com:9900"
 // const sitelink="http://localhost:9969"
 
 const authService = async (JwtData) => {
