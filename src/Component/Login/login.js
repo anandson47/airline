@@ -27,8 +27,12 @@ const Login = () => {
             password: password
         }
         console.log(user)
-        await authService(user);
-        setTimeout( window.location = "/", 10000)
+        await authService(user).then(() => {
+            setTimeout( window.location.reload(), 10000)
+        }).catch((error) => {
+            setTimeout( window.location = "/", 10000)
+        });
+        
 
 
     }

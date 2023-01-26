@@ -22,6 +22,7 @@ import Footer  from './Component/Footer/Footer';
 import 'react-toastify/dist/ReactToastify.css';
 import { Routes , Route } from 'react-router-dom';
 import { userDetails } from './Service/AuthService';
+import HeaderPage from './Component/Header/HeaderPage';
 
 function App() {
 

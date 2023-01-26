@@ -12,6 +12,7 @@ import SearchResult from "./SearchResult";
 import { Navigate, useNavigate } from "react-router";
 import { ToastContainer, toast } from "react-toastify";
 import searchService from "../../Service/SearchService";
+import HeaderPage from "../Header/HeaderPage";
 
 const Search = (props) => {
 
@@ -860,7 +861,7 @@ const Search = (props) => {
 
     return (
         <div className="background">
-            <nav class="navbar navbar1 navbar-expand-lg">
+            {/* <nav class="navbar navbar1 navbar-expand-lg">
                 <div class="container-fluid">
                     <a class="" href="/"><img className="ms-4 navlogo" alt="" src={logo} /> <br /><span class="ms-1 logotext">BROWNFIELD</span> </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -879,7 +880,8 @@ const Search = (props) => {
                         </span>
                     </div>
                 </div>
-            </nav>
+            </nav> */}
+            <HeaderPage/>
             <article class=" bookcard1 center w-90 br4 hidden mv4">
                 <div class="pa3">
                     <div class="cf">
